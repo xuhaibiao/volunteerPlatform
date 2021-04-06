@@ -24,23 +24,32 @@ public class Result<T> {
      */
     T data;
 
-    private Result(int code, String msg, T data) {
+    /**
+     * 有需要时用来做标识区分
+     */
+    String flag;
+
+    private Result(int code, String msg, T data,String flag) {
         this.code = code;
         this.msg = msg;
         this.data = data;
+        this.flag = flag;
     }
 
     public static <T> Result<T> success(String msg, T data) {
-        return new Result<>(1, msg, data);
+        return new Result<>(1, msg, data,"");
     }
     public static <T> Result<T> success(T data) {
-        return new Result<>(1, "", data);
+        return new Result<>(1, "", data,"");
+    }
+    public static <T> Result<T> success(T data,String flag) {
+        return new Result<>(1, "", data,flag);
     }
     public static <T> Result<T> error(String msg) {
-        return new Result<>(2, msg, null);
+        return new Result<>(2, msg, null,"");
     }
     public static <T> Result<T> error() {
-        return new Result<>(2, "", null);
+        return new Result<>(2, "", null,"");
     }
 
 

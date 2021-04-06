@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.xhb.volunteerplatform.mapper.VolunteerMapper">
+  <resultMap id="BaseResultMap" type="cn.xhb.volunteerplatform.entity.Volunteer">
+
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, name, phone, gender, id_card, password, volunteer_hours, volunteer_score, create_time, 
+    ban_status, address, community_id, delete_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from volunteer
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByIdCard" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from volunteer
+    where id_card = #{idCard,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from volunteer
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.xhb.volunteerplatform.entity.Volunteer">
+    insert into volunteer (id, name, phone, 
+      gender, id_card, password, 
+      volunteer_hours, volunteer_score, create_time, 
+      ban_status, address, community_id, 
+      delete_time)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{gender,jdbcType=INTEGER}, #{idCard,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{volunteerHours,jdbcType=REAL}, #{volunteerScore,jdbcType=REAL}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{banStatus,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, #{communityId,jdbcType=INTEGER}, 
+      #{deleteTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xhb.volunteerplatform.entity.Volunteer">
+    insert into volunteer
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="gender != null">
+        gender,
+      </if>
+      <if test="idCard != null">
+        id_card,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="volunteerHours != null">
+        volunteer_hours,
+      </if>
+      <if test="volunteerScore != null">
+        volunteer_score,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="banStatus != null">
+        ban_status,
+      </if>
+      <if test="address != null">
+        address,
+      </if>
+      <if test="communityId != null">
+        community_id,
+      </if>
+      <if test="deleteTime != null">
+        delete_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="idCard != null">
+        #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="volunteerHours != null">
+        #{volunteerHours,jdbcType=REAL},
+      </if>
+      <if test="volunteerScore != null">
+        #{volunteerScore,jdbcType=REAL},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="banStatus != null">
+        #{banStatus,jdbcType=INTEGER},
+      </if>
+      <if test="address != null">
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="communityId != null">
+        #{communityId,jdbcType=INTEGER},
+      </if>
+      <if test="deleteTime != null">
+        #{deleteTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xhb.volunteerplatform.entity.Volunteer">
+    update volunteer
+    <set>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        gender = #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="idCard != null">
+        id_card = #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="volunteerHours != null">
+        volunteer_hours = #{volunteerHours,jdbcType=REAL},
+      </if>
+      <if test="volunteerScore != null">
+        volunteer_score = #{volunteerScore,jdbcType=REAL},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="banStatus != null">
+        ban_status = #{banStatus,jdbcType=INTEGER},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="communityId != null">
+        community_id = #{communityId,jdbcType=INTEGER},
+      </if>
+      <if test="deleteTime != null">
+        delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xhb.volunteerplatform.entity.Volunteer">
+    update volunteer
+    set name = #{name,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=INTEGER},
+      id_card = #{idCard,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      volunteer_hours = #{volunteerHours,jdbcType=REAL},
+      volunteer_score = #{volunteerScore,jdbcType=REAL},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      ban_status = #{banStatus,jdbcType=INTEGER},
+      address = #{address,jdbcType=VARCHAR},
+      community_id = #{communityId,jdbcType=INTEGER},
+      delete_time = #{deleteTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+</mapper>

@@ -2,14 +2,31 @@
 spring:
   datasource:
     #MySQL配置
-    driverClassName:  com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/easyproject?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    driverClassName:  com.mysql.jdbc.Driver
+    url: jdbc:mysql://47.100.23.55:3306/volunteerPlatform?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
     username: root
-    password: 123456
+    password: xhb123
+    type: com.alibaba.druid.pool.DruidDataSource
+    platform: mysql
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT1FROMDUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    filters: stat,wall,log4j
+    logSlowSql: true
+
 
 mybatis:
   mapper-locations: classpath:mapping/*.xml
-  type-aliases-package: cn.xhb.sportplay.bean
+  type-aliases-package: cn.xhb.volunteerplatform.entity
+  configuration:
+    map-underscore-to-camel-case: true
 
 server:
   port: 9000

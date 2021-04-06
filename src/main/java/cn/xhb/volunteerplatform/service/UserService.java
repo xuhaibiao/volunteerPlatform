@@ -1,22 +1,34 @@
 package cn.xhb.volunteerplatform.service;
 
-import cn.xhb.volunteerplatform.entity.User;
-import cn.xhb.volunteerplatform.mapper.UserMapper;
+import cn.xhb.volunteerplatform.entity.Administrator;
+import cn.xhb.volunteerplatform.entity.Volunteer;
+import cn.xhb.volunteerplatform.entity.Worker;
+import cn.xhb.volunteerplatform.mapper.AdministratorMapper;
+import cn.xhb.volunteerplatform.mapper.VolunteerMapper;
+import cn.xhb.volunteerplatform.mapper.WorkerMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
-/**
- * @author HaibiaoXu
- * @date Create in 10:56 2021/3/4
- * @modified By
- */
 @Service
 public class UserService {
     @Resource
-    UserMapper userMapper;
+    AdministratorMapper administratorMapper;
+    @Resource
+    VolunteerMapper volunteerMapper;
+    @Resource
+    WorkerMapper workerMapper;
 
-    public User getByUsername(String username) {
-        return userMapper.getByUsername(username);
+    public Volunteer getVolunteerByIdCard(String idCard) {
+        return volunteerMapper.selectByIdCard(idCard);
     }
+
+    public Worker getWorkerByIdCard(String idCard) {
+        return workerMapper.selectByIdCard(idCard);
+    }
+
+    public Administrator getAdministratorByIdCard(String idCard) {
+        return administratorMapper.selectByIdCard(idCard);
+    }
+
 }

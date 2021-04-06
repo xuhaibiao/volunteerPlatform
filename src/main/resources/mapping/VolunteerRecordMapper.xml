@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.xhb.volunteerplatform.mapper.VolunteerRecordMapper" >
+  <resultMap id="BaseResultMap" type="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="volunteer_id" property="volunteerId" jdbcType="INTEGER" />
+    <result column="activity_id" property="activityId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="volunteer_evaluate" property="volunteerEvaluate" jdbcType="VARCHAR" />
+    <result column="worker_evaluate" property="workerEvaluate" jdbcType="REAL" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, volunteer_id, activity_id, status, volunteer_evaluate, worker_evaluate
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from volunteer_record
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="countByActivity" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+    select count(*)
+    from volunteer_record
+    where activity_id =#{activityId,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from volunteer_record
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
+    insert into volunteer_record (id, volunteer_id, activity_id, 
+      status, volunteer_evaluate, worker_evaluate
+      )
+    values (#{id,jdbcType=INTEGER}, #{volunteerId,jdbcType=INTEGER}, #{activityId,jdbcType=INTEGER}, 
+      #{status,jdbcType=INTEGER}, #{volunteerEvaluate,jdbcType=VARCHAR}, #{workerEvaluate,jdbcType=REAL}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
+    insert into volunteer_record
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="volunteerId != null" >
+        volunteer_id,
+      </if>
+      <if test="activityId != null" >
+        activity_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="volunteerEvaluate != null" >
+        volunteer_evaluate,
+      </if>
+      <if test="workerEvaluate != null" >
+        worker_evaluate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="volunteerId != null" >
+        #{volunteerId,jdbcType=INTEGER},
+      </if>
+      <if test="activityId != null" >
+        #{activityId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="volunteerEvaluate != null" >
+        #{volunteerEvaluate,jdbcType=VARCHAR},
+      </if>
+      <if test="workerEvaluate != null" >
+        #{workerEvaluate,jdbcType=REAL},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
+    update volunteer_record
+    <set >
+      <if test="volunteerId != null" >
+        volunteer_id = #{volunteerId,jdbcType=INTEGER},
+      </if>
+      <if test="activityId != null" >
+        activity_id = #{activityId,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="volunteerEvaluate != null" >
+        volunteer_evaluate = #{volunteerEvaluate,jdbcType=VARCHAR},
+      </if>
+      <if test="workerEvaluate != null" >
+        worker_evaluate = #{workerEvaluate,jdbcType=REAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
+    update volunteer_record
+    set volunteer_id = #{volunteerId,jdbcType=INTEGER},
+      activity_id = #{activityId,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      volunteer_evaluate = #{volunteerEvaluate,jdbcType=VARCHAR},
+      worker_evaluate = #{workerEvaluate,jdbcType=REAL}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

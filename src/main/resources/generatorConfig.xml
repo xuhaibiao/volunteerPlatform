@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+        "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+    <!-- 1.配置数据库驱动 -->
+    <classPathEntry location="C:/Users/Lucas/.m2/repository/mysql/mysql-connector-java/5.1.8/mysql-connector-java-5.1.8.jar"/>
+    <context id="MySQL_TABLES" defaultModelType="flat">
+        <commentGenerator>
+            <!-- 2.注释关闭 -->
+            <property name="suppressAllComments" value="true"/>
+        </commentGenerator>
+        <!-- 3.数据库连接 -->
+        <jdbcConnection connectionURL="jdbc:mysql://47.100.23.55:3306/volunteerPlatform" driverClass="com.mysql.jdbc.Driver" password="xhb123" userId="root" />
+        <!-- 4.生成Model 实体类-->
+        <javaModelGenerator targetPackage="model" targetProject="C:\Users\Lucas\IdeaProjects\volunteerPlatform\src\main\java\" >
+            <!-- 包名不存在，自动创建 -->
+            <property name="enableSubPackages" value="true"/>
+        </javaModelGenerator>
+        <!-- 5.生成Mapper 映射文件 -->
+        <sqlMapGenerator targetPackage="mapping" targetProject="C:\Users\Lucas\IdeaProjects\volunteerPlatform\src\main\java\" >
+            <property name="enableSubPackages" value="true"/>
+        </sqlMapGenerator>
+        <!-- 6.生成Dao 数据操作 -->
+        <javaClientGenerator targetPackage="mapper" targetProject="C:\Users\Lucas\IdeaProjects\volunteerPlatform\src\main\java\" type="XMLMAPPER" >
+            <property name="enableSubPackages" value="true"/>
+        </javaClientGenerator>
+        <!-- 7.生成多张表 -->
+        <!--<table tableName="worker" domainObjectName="Worker" enableCountByExample="true" enableUpdateByExample="true" enableDeleteByExample="true" enableSelectByExample="true" selectByExampleQueryId="true">
+         </table>-->
+         <table tableName="volunteer_record" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+         </table>
+       <!-- <table tableName="%" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+        </table>-->
+    </context>
+</generatorConfiguration>

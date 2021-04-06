@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.xhb.volunteerplatform.mapper.ActivityMapper" >
+  <resultMap id="BaseResultMap" type="cn.xhb.volunteerplatform.entity.Activity" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="recruit_begin_time" property="recruitBeginTime" jdbcType="TIMESTAMP" />
+    <result column="recruit_end_time" property="recruitEndTime" jdbcType="TIMESTAMP" />
+    <result column="activity_begin_time" property="activityBeginTime" jdbcType="TIMESTAMP" />
+    <result column="activity_end_time" property="activityEndTime" jdbcType="TIMESTAMP" />
+    <result column="recruit_number" property="recruitNumber" jdbcType="INTEGER" />
+    <result column="working_hours" property="workingHours" jdbcType="REAL" />
+    <result column="detail_address" property="detailAddress" jdbcType="VARCHAR" />
+    <result column="recruit_range" property="recruitRange" jdbcType="INTEGER" />
+    <result column="worker_id" property="workerId" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, address, name, content, recruit_begin_time, recruit_end_time, activity_begin_time, 
+    activity_end_time, recruit_number, working_hours, detail_address, recruit_range, 
+    worker_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from activity
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from activity
+  </select>
+  <select id="selectByAddress" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select
+    <include refid="Base_Column_List" />
+    from activity
+    where address = #{address,jdbcType=VARCHAR}
+  </select>
+
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from activity
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="cn.xhb.volunteerplatform.entity.Activity" >
+    insert into activity (id, address, name, 
+      content, recruit_begin_time, recruit_end_time, 
+      activity_begin_time, activity_end_time, 
+      recruit_number, working_hours, detail_address, 
+      recruit_range, worker_id)
+    values (#{id,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{content,jdbcType=VARCHAR}, #{recruitBeginTime,jdbcType=TIMESTAMP}, #{recruitEndTime,jdbcType=TIMESTAMP}, 
+      #{activityBeginTime,jdbcType=TIMESTAMP}, #{activityEndTime,jdbcType=TIMESTAMP}, 
+      #{recruitNumber,jdbcType=INTEGER}, #{workingHours,jdbcType=REAL}, #{detailAddress,jdbcType=VARCHAR}, 
+      #{recruitRange,jdbcType=INTEGER}, #{workerId,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="cn.xhb.volunteerplatform.entity.Activity" >
+    insert into activity
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="recruitBeginTime != null" >
+        recruit_begin_time,
+      </if>
+      <if test="recruitEndTime != null" >
+        recruit_end_time,
+      </if>
+      <if test="activityBeginTime != null" >
+        activity_begin_time,
+      </if>
+      <if test="activityEndTime != null" >
+        activity_end_time,
+      </if>
+      <if test="recruitNumber != null" >
+        recruit_number,
+      </if>
+      <if test="workingHours != null" >
+        working_hours,
+      </if>
+      <if test="detailAddress != null" >
+        detail_address,
+      </if>
+      <if test="recruitRange != null" >
+        recruit_range,
+      </if>
+      <if test="workerId != null" >
+        worker_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="recruitBeginTime != null" >
+        #{recruitBeginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="recruitEndTime != null" >
+        #{recruitEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="activityBeginTime != null" >
+        #{activityBeginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="activityEndTime != null" >
+        #{activityEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="recruitNumber != null" >
+        #{recruitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="workingHours != null" >
+        #{workingHours,jdbcType=REAL},
+      </if>
+      <if test="detailAddress != null" >
+        #{detailAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="recruitRange != null" >
+        #{recruitRange,jdbcType=INTEGER},
+      </if>
+      <if test="workerId != null" >
+        #{workerId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.xhb.volunteerplatform.entity.Activity" >
+    update activity
+    <set >
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="recruitBeginTime != null" >
+        recruit_begin_time = #{recruitBeginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="recruitEndTime != null" >
+        recruit_end_time = #{recruitEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="activityBeginTime != null" >
+        activity_begin_time = #{activityBeginTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="activityEndTime != null" >
+        activity_end_time = #{activityEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="recruitNumber != null" >
+        recruit_number = #{recruitNumber,jdbcType=INTEGER},
+      </if>
+      <if test="workingHours != null" >
+        working_hours = #{workingHours,jdbcType=REAL},
+      </if>
+      <if test="detailAddress != null" >
+        detail_address = #{detailAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="recruitRange != null" >
+        recruit_range = #{recruitRange,jdbcType=INTEGER},
+      </if>
+      <if test="workerId != null" >
+        worker_id = #{workerId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.xhb.volunteerplatform.entity.Activity" >
+    update activity
+    set address = #{address,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      recruit_begin_time = #{recruitBeginTime,jdbcType=TIMESTAMP},
+      recruit_end_time = #{recruitEndTime,jdbcType=TIMESTAMP},
+      activity_begin_time = #{activityBeginTime,jdbcType=TIMESTAMP},
+      activity_end_time = #{activityEndTime,jdbcType=TIMESTAMP},
+      recruit_number = #{recruitNumber,jdbcType=INTEGER},
+      working_hours = #{workingHours,jdbcType=REAL},
+      detail_address = #{detailAddress,jdbcType=VARCHAR},
+      recruit_range = #{recruitRange,jdbcType=INTEGER},
+      worker_id = #{workerId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
