@@ -5,10 +5,7 @@ import cn.xhb.volunteerplatform.dto.LoginRequest;
 import cn.xhb.volunteerplatform.dto.Result;
 import cn.xhb.volunteerplatform.entity.BaseUser;
 import cn.xhb.volunteerplatform.service.UserService;
-import com.google.gson.Gson;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -36,11 +33,34 @@ public class CommonController {
         }
 
         if (user != null && user.getPassword().equals(loginRequest.getPassword()) ) {
+            // 密码不返前端
+//            user.setPassword(null);
             return Result.success(user, String.valueOf(type));
         } else{
             return Result.error();
         }
     }
+
+
+    @GetMapping("/information")
+    public Result<BaseUser> getInformation(@RequestParam("userId") Integer userId,@RequestParam("type") Integer type) {
+        BaseUser user = null;
+        if (type == 0) {
+            user = userService.getVolunteerById(userId);
+        } else if (type == 1) {
+            user = userService.getWorkerById(userId);
+        } else if (type == 2) {
+            user = userService.getAdministratorById(userId);
+        }
+        if (user != null) {
+//            user.setPassword(null);
+            return Result.success(user);
+        }else{
+            return Result.error();
+        }
+    }
+
+
 
 
 }

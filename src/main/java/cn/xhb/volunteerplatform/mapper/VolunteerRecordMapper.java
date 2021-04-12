@@ -24,6 +24,8 @@ public interface VolunteerRecordMapper {
 
     List<VolunteerRecord> selectByActivityIdAndStatus(Integer activityId, Integer status);
 
+    List<VolunteerRecord> selectByActivityIdAndTwoStatus(Integer activityId, Integer status1, Integer status2);
+
     int countByActivity(Integer activityId);
 
     int updateByPrimaryKeySelective(VolunteerRecord record);

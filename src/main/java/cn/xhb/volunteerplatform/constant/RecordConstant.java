@@ -11,8 +11,11 @@ public interface RecordConstant {
     int REGISTRATION_PASSED = 2;
     int ACTIVITY_IN_PROGRESS = 3;
     int ACTIVITY_IS_OVER = 4;
-    int HAS_EVALUATE = 5;
-    int ACTIVITY_HAS_DELETED = 6;
+    int VOLUNTEER_HAS_EVALUATE_WORKER_NOT = 5;
+    int WORKER_HAS_EVALUATE_VOLUNTEER_NOT= 6;
+    int ALL_HAS_EVALUATE = 7;
+    int ACTIVITY_HAS_DELETED = 8;
+
 
 
 

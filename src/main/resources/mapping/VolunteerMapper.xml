@@ -6,7 +6,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     id, name, phone, gender, id_card, password, volunteer_hours, volunteer_score, create_time, 
-    ban_status, address, community_id, delete_time
+    ban_status, address, community_id, delete_time,volunteer_number
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -29,12 +29,12 @@
       gender, id_card, password, 
       volunteer_hours, volunteer_score, create_time, 
       ban_status, address, community_id, 
-      delete_time)
+      delete_time,volunteer_number)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
       #{gender,jdbcType=INTEGER}, #{idCard,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
       #{volunteerHours,jdbcType=REAL}, #{volunteerScore,jdbcType=REAL}, #{createTime,jdbcType=TIMESTAMP}, 
       #{banStatus,jdbcType=INTEGER}, #{address,jdbcType=VARCHAR}, #{communityId,jdbcType=INTEGER}, 
-      #{deleteTime,jdbcType=TIMESTAMP})
+      #{deleteTime,jdbcType=TIMESTAMP},#{volunteerNumber,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="cn.xhb.volunteerplatform.entity.Volunteer">
     insert into volunteer
@@ -78,6 +78,9 @@
       <if test="deleteTime != null">
         delete_time,
       </if>
+      <if test="volunteerNumber != null">
+        volunteer_number,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -118,6 +121,9 @@
       </if>
       <if test="deleteTime != null">
         #{deleteTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="volunteerNumber != null">
+        #{volunteerNumber,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -160,6 +166,9 @@
       <if test="deleteTime != null">
         delete_time = #{deleteTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="volunteerNumber != null">
+        volunteer_number = #{volunteerNumber,jdbcType=INTEGER},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -176,8 +185,8 @@
       ban_status = #{banStatus,jdbcType=INTEGER},
       address = #{address,jdbcType=VARCHAR},
       community_id = #{communityId,jdbcType=INTEGER},
-      delete_time = #{deleteTime,jdbcType=TIMESTAMP}
+      delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+      volunteer_number = #{volunteerNumber,jdbcType=INTEGER}
     where id = #{id,jdbcType=INTEGER}
   </update>
-
 </mapper>

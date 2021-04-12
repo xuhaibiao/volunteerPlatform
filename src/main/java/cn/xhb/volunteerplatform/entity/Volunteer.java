@@ -22,5 +22,7 @@ public class Volunteer extends BaseUser{
 
     private Date deleteTime;
 
+    private Integer volunteerNumber;
+
 
 }

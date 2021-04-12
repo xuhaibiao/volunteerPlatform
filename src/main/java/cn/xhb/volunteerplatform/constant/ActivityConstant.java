@@ -4,8 +4,7 @@ public interface ActivityConstant {
 
     String RECRUIT_NOT_STARTED = "招募未开始";
     String RECRUITING = "招募中";
-    String RECRUIT_OVER = "招募已结束";
-    String ACITVITY_NOT_STARTED = "活动未开始";
+    String ACITVITY_NOT_STARTED = "招募结束,活动未开始";
     String ACITVITY_DOING = "活动进行中";
     String ACITVITY_OVER = "活动已结束";
 

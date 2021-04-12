@@ -95,8 +95,8 @@ public class VolunteerController {
     }
 
     @PostMapping("/record/evaluate")
-    public Result<Object> evaluate(@RequestBody EvaluateRequest evaluateRequest){
-        int i = evaluateService.volunteerEvaluate(evaluateRequest.getScore(), evaluateRequest.getContent(), evaluateRequest.getRecordId());
+    public Result<Object> evaluate(@RequestBody VolunteerEvaluateRequest evaluateRequest){
+        int i = evaluateService.volunteerEvaluate(evaluateRequest.getScore(), evaluateRequest.getContent(), evaluateRequest.getRecordId(), evaluateRequest.getRecordStatus());
         if (i > 0) {
             return Result.success(null);
         } else {

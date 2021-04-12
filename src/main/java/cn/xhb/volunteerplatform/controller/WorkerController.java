@@ -93,9 +93,25 @@ public class WorkerController {
         }
     }
 
-    @PutMapping("/activity/refuseJoin")
+    @PostMapping("/activity/refuseJoin")
     public Result<Object> refuseJoin(@RequestBody ExamineRequest examineRequest){
-        int i = userService.agreeJoin(examineRequest.getRecordId());
+        int i = userService.refuseJoin(examineRequest.getRecordId());
+        if (i > 0) {
+            return Result.success(null);
+        } else {
+            return Result.error();
+        }
+    }
+
+    @GetMapping("/needEvaluateRecords")
+    public Result<List<NeedEvaluateRecordsResponse>> getNeedEvaluateRecords(@RequestParam("userId") Integer workerId){
+        List<NeedEvaluateRecordsResponse> rs = userService.needEvaluateRecordsResponseByWorkerId(workerId);
+        return Result.success(rs);
+    }
+
+    @PostMapping("/needEvaluateRecords/evaluate")
+    public Result<Object> evaluate(@RequestBody WorkerEvaluateRecordsRequest workerEvaluateRecordsRequest){
+        int i = evaluateService.workerEvaluate(workerEvaluateRecordsRequest.getEvaluateScore(), workerEvaluateRecordsRequest.getRecordId(), workerEvaluateRecordsRequest.getRecordStatus());
         if (i > 0) {
             return Result.success(null);
         } else {

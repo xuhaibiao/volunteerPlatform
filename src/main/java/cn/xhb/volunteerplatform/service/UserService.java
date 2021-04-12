@@ -3,6 +3,7 @@ package cn.xhb.volunteerplatform.service;
 import cn.xhb.volunteerplatform.constant.ActivityConstant;
 import cn.xhb.volunteerplatform.constant.RecordConstant;
 import cn.xhb.volunteerplatform.dto.ActivityResponse;
+import cn.xhb.volunteerplatform.dto.NeedEvaluateRecordsResponse;
 import cn.xhb.volunteerplatform.dto.ReviewTableResponse;
 import cn.xhb.volunteerplatform.dto.VolunteerRecordResponse;
 import cn.xhb.volunteerplatform.entity.*;
@@ -32,6 +33,14 @@ public class UserService {
 
     public Volunteer getVolunteerById(Integer id){
         return volunteerMapper.selectByPrimaryKey(id);
+    }
+
+    public Worker getWorkerById(Integer id){
+        return workerMapper.selectByPrimaryKey(id);
+    }
+
+    public Administrator getAdministratorById(Integer id){
+        return administratorMapper.selectByPrimaryKey(id);
     }
 
     public Volunteer getVolunteerByIdCard(String idCard) {
@@ -80,12 +89,17 @@ public class UserService {
             activityResponse.setCommunityName(communityOrganization.getName());
             activityResponse.setSponsor(worker.name);
             Date now2 = new Date();
+            // 活动状态
             if(now2.before(activity.getRecruitBeginTime())){
                 activityResponse.setActivityStatus(ActivityConstant.RECRUIT_NOT_STARTED);
             } else if (now2.before(activity.getRecruitEndTime())) {
                 activityResponse.setActivityStatus(ActivityConstant.RECRUITING);
+            } else if(now2.before(activity.getActivityBeginTime())){
+                activityResponse.setActivityStatus(ActivityConstant.ACITVITY_NOT_STARTED);
+            } else if (now2.before(activity.getActivityEndTime())) {
+                activityResponse.setActivityStatus(ActivityConstant.ACITVITY_DOING);
             } else {
-                activityResponse.setActivityStatus(ActivityConstant.RECRUIT_OVER);
+                activityResponse.setActivityStatus(ActivityConstant.ACITVITY_OVER);
             }
             int signedUp = volunteerRecordMapper.countByActivity(activity.getId());
             activityResponse.setHasRecruitedNumber(signedUp);
@@ -96,9 +110,38 @@ public class UserService {
         return rs;
     }
 
+    /**
+     * 获取社区工作者需要评价的记录
+     * @param workerId 社区工作者id
+     * @return 社区工作者需要评价的记录
+     */
+    public List<NeedEvaluateRecordsResponse> needEvaluateRecordsResponseByWorkerId(Integer workerId) {
+        List<Activity> activities = activityMapper.selectNotDeletedByWorkerId(workerId);
+        List<NeedEvaluateRecordsResponse> rs = new ArrayList<>();
+        for (Activity activity : activities) {
+            List<VolunteerRecord> volunteerRecords = volunteerRecordMapper.selectByActivityIdAndTwoStatus(activity.getId(), RecordConstant.ACTIVITY_IS_OVER, RecordConstant.VOLUNTEER_HAS_EVALUATE_WORKER_NOT);
+            for (VolunteerRecord volunteerRecord : volunteerRecords) {
+                NeedEvaluateRecordsResponse tmp = new NeedEvaluateRecordsResponse();
+                tmp.setRecordId(volunteerRecord.getId());
+                tmp.setRecordStatus(volunteerRecord.getStatus());
+                tmp.setActivityId(volunteerRecord.getActivityId());
+                tmp.setActivityName(activity.getName());
+                Integer volunteerId = volunteerRecord.getVolunteerId();
+                Volunteer volunteer = volunteerMapper.selectByPrimaryKey(volunteerId);
+                tmp.setVolunteerName(volunteer.getName());
+                rs.add(tmp);
+            }
+        }
+
+        return rs;
+
+
+
+    }
+
     public List<ReviewTableResponse> getRegistrationData(Integer activityId) {
-        // 0表示报名审核中的记录
-        List<VolunteerRecord> volunteerRecords = volunteerRecordMapper.selectByActivityIdAndStatus(activityId, 0);
+        // 报名审核中的记录
+        List<VolunteerRecord> volunteerRecords = volunteerRecordMapper.selectByActivityIdAndStatus(activityId, RecordConstant.REGISTRATION_REVIEWING);
         List<ReviewTableResponse> rs = new ArrayList<>();
         for (VolunteerRecord volunteerRecord : volunteerRecords) {
             ReviewTableResponse tmp = new ReviewTableResponse();
