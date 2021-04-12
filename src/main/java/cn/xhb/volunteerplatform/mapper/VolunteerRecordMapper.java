@@ -1,8 +1,9 @@
 package cn.xhb.volunteerplatform.mapper;
 
 import cn.xhb.volunteerplatform.entity.VolunteerRecord;
-import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 @Repository
 public interface VolunteerRecordMapper {
@@ -14,9 +15,18 @@ public interface VolunteerRecordMapper {
 
     VolunteerRecord selectByPrimaryKey(Integer id);
 
+    int countByVolunteerIdAndActivityId(Integer activityId, Integer volunteerId);
+
+    int countByActivityIdAndStatus(Integer activityId, Integer status);
+
+
+    List<VolunteerRecord> selectByVolunteerId(Integer volunteerId);
+
+    List<VolunteerRecord> selectByActivityIdAndStatus(Integer activityId, Integer status);
+
+    int countByActivity(Integer activityId);
+
     int updateByPrimaryKeySelective(VolunteerRecord record);
 
     int updateByPrimaryKey(VolunteerRecord record);
-
-    int countByActivity(Integer activityId);
 }

@@ -6,11 +6,16 @@
     <result column="volunteer_id" property="volunteerId" jdbcType="INTEGER" />
     <result column="activity_id" property="activityId" jdbcType="INTEGER" />
     <result column="status" property="status" jdbcType="INTEGER" />
-    <result column="volunteer_evaluate" property="volunteerEvaluate" jdbcType="VARCHAR" />
+    <result column="volunteer_evaluate_content" property="volunteerEvaluateContent" jdbcType="VARCHAR" />
+    <result column="volunteer_evaluate_score" property="volunteerEvaluateScore" jdbcType="REAL" />
     <result column="worker_evaluate" property="workerEvaluate" jdbcType="REAL" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="delete_time" property="deleteTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, volunteer_id, activity_id, status, volunteer_evaluate, worker_evaluate
+    id, volunteer_id, activity_id, status, volunteer_evaluate_content, worker_evaluate, create_time,
+    delete_time,volunteer_evaluate_score,update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -18,11 +23,39 @@
     from volunteer_record
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <select id="countByActivity" resultType="java.lang.Integer" parameterType="java.lang.Integer" >
+  <select id="countByActivity"  resultType="java.lang.Integer" parameterType="java.lang.Integer" >
     select count(*)
     from volunteer_record
-    where activity_id =#{activityId,jdbcType=INTEGER}
+    where activity_id = #{activityId,jdbcType=INTEGER}
   </select>
+  <select id="countByVolunteerIdAndActivityId"  resultType="java.lang.Integer" >
+    select count(*)
+    from volunteer_record
+    where activity_id = #{activityId,jdbcType=INTEGER} and volunteer_id = #{volunteerId,jdbcType=INTEGER}
+  </select>
+  <select id="countByActivityIdAndStatus"  resultType="java.lang.Integer" >
+    select count(*)
+    from volunteer_record
+    where activity_id = #{activityId,jdbcType=INTEGER} and status &gt;= #{status,jdbcType=INTEGER}
+  </select>
+
+
+  <select id="selectByVolunteerId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from volunteer_record
+    where volunteer_id = #{volunteerId,jdbcType=INTEGER}
+  </select>
+
+  <select id="selectByActivityIdAndStatus" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from volunteer_record
+    where activity_id = #{activityId,jdbcType=INTEGER} and status = #{status,jdbcType=INTEGER}
+  </select>
+
+
+
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from volunteer_record
@@ -30,11 +63,11 @@
   </delete>
   <insert id="insert" parameterType="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
     insert into volunteer_record (id, volunteer_id, activity_id, 
-      status, volunteer_evaluate, worker_evaluate
-      )
+      status, volunteer_evaluate_content, worker_evaluate,
+      create_time, delete_time,volunteer_evaluate_score,update_time)
     values (#{id,jdbcType=INTEGER}, #{volunteerId,jdbcType=INTEGER}, #{activityId,jdbcType=INTEGER}, 
-      #{status,jdbcType=INTEGER}, #{volunteerEvaluate,jdbcType=VARCHAR}, #{workerEvaluate,jdbcType=REAL}
-      )
+      #{status,jdbcType=INTEGER}, #{volunteerEvaluateContent,jdbcType=VARCHAR}, #{workerEvaluate,jdbcType=REAL},
+      #{createTime,jdbcType=TIMESTAMP}, #{deleteTime,jdbcType=TIMESTAMP},#{volunteerEvaluateScore,jdbcType=REAL},#{updateTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
     insert into volunteer_record
@@ -51,12 +84,25 @@
       <if test="status != null" >
         status,
       </if>
-      <if test="volunteerEvaluate != null" >
-        volunteer_evaluate,
+      <if test="volunteerEvaluateContent != null" >
+        volunteer_evaluate_content,
       </if>
       <if test="workerEvaluate != null" >
         worker_evaluate,
       </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="deleteTime != null" >
+        delete_time,
+      </if>
+      <if test="volunteerEvaluateScore != null" >
+        volunteer_evaluate_score,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -71,12 +117,25 @@
       <if test="status != null" >
         #{status,jdbcType=INTEGER},
       </if>
-      <if test="volunteerEvaluate != null" >
-        #{volunteerEvaluate,jdbcType=VARCHAR},
+      <if test="volunteerEvaluateContent != null" >
+        #{volunteerEvaluateContent,jdbcType=VARCHAR},
       </if>
       <if test="workerEvaluate != null" >
         #{workerEvaluate,jdbcType=REAL},
       </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleteTime != null" >
+        #{deleteTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="volunteerEvaluateScore != null" >
+        #{volunteerEvaluateScore,jdbcType=REAL},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
@@ -91,11 +150,23 @@
       <if test="status != null" >
         status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="volunteerEvaluate != null" >
-        volunteer_evaluate = #{volunteerEvaluate,jdbcType=VARCHAR},
+      <if test="volunteerEvaluateContent != null" >
+        volunteer_evaluate_content = #{volunteerEvaluateContent,jdbcType=VARCHAR},
       </if>
       <if test="workerEvaluate != null" >
         worker_evaluate = #{workerEvaluate,jdbcType=REAL},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deleteTime != null" >
+        delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="volunteerEvaluateScore != null" >
+        volunteer_evaluate_score = #{volunteerEvaluateScore,jdbcType=REAL},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -105,8 +176,11 @@
     set volunteer_id = #{volunteerId,jdbcType=INTEGER},
       activity_id = #{activityId,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
-      volunteer_evaluate = #{volunteerEvaluate,jdbcType=VARCHAR},
-      worker_evaluate = #{workerEvaluate,jdbcType=REAL}
+      volunteer_evaluate_content = #{volunteerEvaluateContent,jdbcType=VARCHAR},
+      worker_evaluate = #{workerEvaluate,jdbcType=REAL},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+      volunteer_evaluate_score = #{volunteerEvaluateScore,jdbcType=REAL},update_time = #{updateTime,jdbcType=TIMESTAMP},
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

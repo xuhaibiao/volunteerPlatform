@@ -32,5 +32,15 @@ public class ActivityResponse {
      */
     private Integer hasRecruitedNumber;
 
+    /**
+     * 审核通过人数
+     */
+    private Integer hasAgreeNumber;
+
+    /**
+     * 活动状态
+     */
     private String activityStatus;
+
+
 }

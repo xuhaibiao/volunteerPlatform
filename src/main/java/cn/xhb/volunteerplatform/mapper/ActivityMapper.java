@@ -1,6 +1,8 @@
 package cn.xhb.volunteerplatform.mapper;
 
+import cn.xhb.volunteerplatform.dto.ActivitySearchQuery;
 import cn.xhb.volunteerplatform.entity.Activity;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,7 +19,11 @@ public interface ActivityMapper {
 
     List<Activity> selectAll();
 
-    List<Activity> selectByAddress(String address);
+    List<Activity> selectNotDeleted();
+
+    List<Activity> selectNotDeletedByWorkerId(Integer workerId);
+
+    List<Activity> selectNotDeletedBySearch(@Param("activitySearchQuery") ActivitySearchQuery activitySearchQuery);
 
     int updateByPrimaryKeySelective(Activity record);
 

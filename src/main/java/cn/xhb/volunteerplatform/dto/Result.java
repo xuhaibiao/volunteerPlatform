@@ -48,6 +48,9 @@ public class Result<T> {
     public static <T> Result<T> error(String msg) {
         return new Result<>(2, msg, null,"");
     }
+    public static <T> Result<T> error(String msg,String flag) {
+        return new Result<>(2, msg, null,flag);
+    }
     public static <T> Result<T> error() {
         return new Result<>(2, "", null,"");
     }

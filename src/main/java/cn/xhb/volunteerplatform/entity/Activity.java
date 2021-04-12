@@ -8,11 +8,11 @@ import java.util.Date;
 public class Activity {
     private Integer id;
 
-    private String address;
+    private String province;
+    private String city;
+    private String area;
 
     private String name;
-
-    private String content;
 
     private Date recruitBeginTime;
 
@@ -31,6 +31,16 @@ public class Activity {
     private Integer recruitRange;
 
     private Integer workerId;
+
+    private Date createTime;
+
+    private Date deleteTime;
+
+    private Integer hasDeleted;
+
+    private Date updateTime;
+
+    private String content;
 
 
 }

@@ -27,7 +27,7 @@
         <!-- 7.生成多张表 -->
         <!--<table tableName="worker" domainObjectName="Worker" enableCountByExample="true" enableUpdateByExample="true" enableDeleteByExample="true" enableSelectByExample="true" selectByExampleQueryId="true">
          </table>-->
-         <table tableName="volunteer_record" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
+         <table tableName="activity" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
          </table>
        <!-- <table tableName="%" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false">
         </table>-->
