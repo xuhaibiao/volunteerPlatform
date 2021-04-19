@@ -20,6 +20,13 @@
     from worker
     where id_card = #{idCard,jdbcType=VARCHAR}
   </select>
+  <select id="selectByCommunityId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select
+    <include refid="Base_Column_List" />
+    from worker
+    where  community_id = #{communityId,jdbcType=INTEGER}
+  </select>
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from worker
     where id = #{id,jdbcType=INTEGER}

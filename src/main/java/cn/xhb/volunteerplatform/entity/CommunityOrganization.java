@@ -12,9 +12,21 @@ public class CommunityOrganization {
 
     private Date createTime;
 
-    private String address;
+    private String detailAddress;
 
     private String undertaker;
+
+    private String province;
+
+    private String city;
+
+    private String area;
+
+    private Date updateTime;
+
+    private Integer hasDeleted;
+
+    private Date deleteTime;
 
 
 }

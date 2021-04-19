@@ -3,6 +3,8 @@ package cn.xhb.volunteerplatform.mapper;
 import cn.xhb.volunteerplatform.entity.Volunteer;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface VolunteerMapper {
     int deleteByPrimaryKey(Integer id);
@@ -18,4 +20,6 @@ public interface VolunteerMapper {
     int updateByPrimaryKeySelective(Volunteer record);
 
     int updateByPrimaryKey(Volunteer record);
+
+    List<Volunteer> selectByCommunityId(Integer communityId);
 }

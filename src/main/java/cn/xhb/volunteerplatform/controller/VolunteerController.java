@@ -2,11 +2,9 @@ package cn.xhb.volunteerplatform.controller;
 
 import cn.xhb.volunteerplatform.constant.ActivityConstant;
 import cn.xhb.volunteerplatform.dto.*;
-import cn.xhb.volunteerplatform.entity.BaseUser;
+import cn.xhb.volunteerplatform.entity.CommunityOrganization;
 import cn.xhb.volunteerplatform.entity.Volunteer;
-import cn.xhb.volunteerplatform.service.ActivityService;
-import cn.xhb.volunteerplatform.service.EvaluateService;
-import cn.xhb.volunteerplatform.service.UserService;
+import cn.xhb.volunteerplatform.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
@@ -22,6 +20,10 @@ public class VolunteerController {
     UserService userService;
     @Resource
     EvaluateService evaluateService;
+    @Resource
+    CommunityService communityService;
+    @Resource
+    MessageService messageService;
 
 
     @GetMapping("/activity")
@@ -77,16 +79,7 @@ public class VolunteerController {
 
     }
 
-    @PostMapping("/information/edit")
-    public Result<BaseUser> updateVolunteer(@RequestBody Volunteer volunteer){
-        int i = userService.updateVolunteer(volunteer);
-        if (i > 0) {
-            Volunteer v = userService.getVolunteerById(volunteer.id);
-            return Result.success(v);
-        } else {
-            return Result.error();
-        }
-    }
+
 
     @GetMapping("/record")
     public Result<List<VolunteerRecordResponse>> getVolunteerRecords(@RequestParam Integer userId) {
@@ -103,5 +96,77 @@ public class VolunteerController {
             return Result.error();
         }
     }
+
+    @GetMapping("/community")
+    public Result<VolunteerGetCommunityResponse> getCommunities(@RequestParam("volunteerId") Integer volunteerId) {
+        Volunteer volunteer = userService.getVolunteerById(volunteerId);
+        VolunteerGetCommunityResponse communityResponse = new VolunteerGetCommunityResponse();
+        List<CommunityOrganization> rs = communityService.getNotDeletedCommunities();
+        communityResponse.setCommunityOrganizations(rs);
+        CommunityOrganization community = communityService.getCommunity(volunteer.getCommunityId());
+        communityResponse.setUserCommuntity(community);
+        communityResponse.setVolunteer(volunteer);
+        return Result.success(communityResponse);
+    }
+
+    @GetMapping("/community/search")
+    public Result<VolunteerGetCommunityResponse> getCommunityBySearch(@RequestParam("province") String province,@RequestParam("city") String city,@RequestParam("area") String area,@RequestParam("communityName") String communityName) {
+        CommunitySearchQuery communitySearchQuery = new CommunitySearchQuery();
+        if("省".equals(province)){
+            communitySearchQuery.setProvince(null);
+            communitySearchQuery.setCity(null);
+            communitySearchQuery.setArea(null);
+        } else if ("市".equals(city)) {
+            communitySearchQuery.setProvince(province);
+            communitySearchQuery.setCity(null);
+            communitySearchQuery.setArea(null);
+        } else if ("区".equals(area)) {
+            communitySearchQuery.setProvince(province);
+            communitySearchQuery.setCity(city);
+            communitySearchQuery.setArea(null);
+        } else {
+            communitySearchQuery.setProvince(province);
+            communitySearchQuery.setCity(city);
+            communitySearchQuery.setArea(area);
+        }
+        if (StringUtils.isNotBlank(communityName)) {
+            communitySearchQuery.setCommunityName(communityName);
+        } else {
+            communitySearchQuery.setCommunityName(null);
+        }
+        List<CommunityOrganization> rs = communityService.getNotDeletedCommunitiesBySearch(communitySearchQuery);
+        VolunteerGetCommunityResponse volunteerGetCommunityResponse = new VolunteerGetCommunityResponse();
+        volunteerGetCommunityResponse.setCommunityOrganizations(rs);
+        return Result.success(volunteerGetCommunityResponse);
+    }
+
+    @PostMapping("/community/quit")
+    public Result<Object> quitCommunity(@RequestBody Volunteer volunteer){
+        int i = communityService.quitCommunity(volunteer.getId(), volunteer.getName(), volunteer.getIdCard(), volunteer.getCommunityId());
+        if (i > 0) {
+            return Result.success(null);
+        } else {
+            return Result.error();
+        }
+    }
+
+    @PostMapping("/community/join")
+    public Result<Object> joinCommunity(@RequestBody JoinRequest joinRequest){
+        int i = communityService.joinCommunity(joinRequest);
+        if (i > 0) {
+            return Result.success(null);
+        } else if (i == -1) {
+            return Result.error("已经申请过该组织，请耐心等待工作人员审核！");
+        } else {
+            return Result.error("申请出错！");
+        }
+    }
+
+    @GetMapping("/message")
+    public Result<MessageResponse> getMessages(@RequestParam("communityId") Integer communityId) {
+        MessageResponse rs = messageService.getVolunteerMessages(communityId);
+        return Result.success(rs);
+    }
+
 
 }

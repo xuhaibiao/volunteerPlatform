@@ -23,6 +23,11 @@ public class ActivityResponse {
     private String communityName;
 
     /**
+     * 发起社区id
+     */
+    private Integer communityId;
+
+    /**
      * 计划招募人数
      */
     private Integer recruitNumber;

@@ -1,10 +1,15 @@
 package cn.xhb.volunteerplatform.controller;
 
 
+import cn.xhb.volunteerplatform.dto.InformationEditRequest;
 import cn.xhb.volunteerplatform.dto.LoginRequest;
 import cn.xhb.volunteerplatform.dto.Result;
+import cn.xhb.volunteerplatform.entity.Administrator;
 import cn.xhb.volunteerplatform.entity.BaseUser;
+import cn.xhb.volunteerplatform.entity.Volunteer;
+import cn.xhb.volunteerplatform.entity.Worker;
 import cn.xhb.volunteerplatform.service.UserService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -58,6 +63,42 @@ public class CommonController {
         }else{
             return Result.error();
         }
+    }
+
+    @PostMapping("/information/edit")
+    public Result<BaseUser> updateVolunteer(@RequestBody InformationEditRequest informationEditRequest){
+        if (informationEditRequest.getType() == 0) {
+            Volunteer volunteer = new Volunteer();
+            BeanUtils.copyProperties(informationEditRequest, volunteer);
+            int i = userService.updateVolunteer(volunteer);
+            if (i > 0) {
+                Volunteer v = userService.getVolunteerById(volunteer.id);
+                return Result.success(v);
+            } else {
+                return Result.error();
+            }
+        } else if (informationEditRequest.getType() == 1) {
+            Worker worker = new Worker();
+            BeanUtils.copyProperties(informationEditRequest, worker);
+            int i = userService.updateWorker(worker);
+            if (i > 0) {
+                Worker w = userService.getWorkerById(worker.id);
+                return Result.success(w);
+            } else {
+                return Result.error();
+            }
+        } else {
+            Administrator administrator = new Administrator();
+            BeanUtils.copyProperties(informationEditRequest, administrator);
+            int i = userService.updateAdministrator(administrator);
+            if (i > 0) {
+                Administrator a = userService.getAdministratorById(administrator.id);
+                return Result.success(a);
+            } else {
+                return Result.error();
+            }
+        }
+
     }
 
 

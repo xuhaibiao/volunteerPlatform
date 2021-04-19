@@ -11,7 +11,6 @@ import cn.xhb.volunteerplatform.mapper.ActivityMapper;
 import cn.xhb.volunteerplatform.mapper.CommunityOrganizationMapper;
 import cn.xhb.volunteerplatform.mapper.VolunteerRecordMapper;
 import cn.xhb.volunteerplatform.mapper.WorkerMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -45,6 +44,7 @@ public class ActivityService {
             Worker worker = workerMapper.selectByPrimaryKey(activity.getWorkerId());
             CommunityOrganization communityOrganization = communityOrganizationMapper.selectByPrimaryKey(worker.getCommunityId());
             activityResponse.setCommunityName(communityOrganization.getName());
+            activityResponse.setCommunityId(communityOrganization.getId());
             activityResponse.setSponsor(worker.name);
             // 活动状态
             Date now = new Date();

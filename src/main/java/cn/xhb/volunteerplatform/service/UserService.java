@@ -51,6 +51,14 @@ public class UserService {
         return volunteerMapper.updateByPrimaryKeySelective(volunteer);
     }
 
+    public int updateWorker(Worker worker) {
+        return workerMapper.updateByPrimaryKeySelective(worker);
+    }
+    public int updateAdministrator(Administrator administrator) {
+        return administratorMapper.updateByPrimaryKeySelective(administrator);
+    }
+
+
     public Worker getWorkerByIdCard(String idCard) {
         return workerMapper.selectByIdCard(idCard);
     }
@@ -157,6 +165,11 @@ public class UserService {
     }
 
 
+    /**
+     * 同意活动报名申请
+     * @param recordId
+     * @return
+     */
     public int agreeJoin(Integer recordId) {
         VolunteerRecord volunteerRecord = new VolunteerRecord();
         volunteerRecord.setStatus(RecordConstant.REGISTRATION_PASSED);
@@ -165,6 +178,11 @@ public class UserService {
         return volunteerRecordMapper.updateByPrimaryKeySelective(volunteerRecord);
     }
 
+    /**
+     * 拒绝活动报名申请
+     * @param recordId
+     * @return
+     */
     public int refuseJoin(Integer recordId) {
         VolunteerRecord volunteerRecord = new VolunteerRecord();
         volunteerRecord.setStatus(RecordConstant.REGISTRATION_FAILED);
@@ -172,5 +190,15 @@ public class UserService {
         volunteerRecord.setId(recordId);
         return volunteerRecordMapper.updateByPrimaryKeySelective(volunteerRecord);
     }
+
+
+    public List<Volunteer> getVolunteerByCommunityId(Integer communityId) {
+        return volunteerMapper.selectByCommunityId(communityId);
+    }
+
+    public List<Worker> getWorkerByCommunityId(Integer communityId) {
+        return workerMapper.selectByCommunityId(communityId);
+    }
+
 
 }

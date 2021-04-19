@@ -3,6 +3,8 @@ package cn.xhb.volunteerplatform.mapper;
 import cn.xhb.volunteerplatform.entity.Worker;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface WorkerMapper {
     int deleteByPrimaryKey(Integer id);
@@ -18,4 +20,6 @@ public interface WorkerMapper {
     int updateByPrimaryKeySelective(Worker record);
 
     int updateByPrimaryKey(Worker record);
+
+    List<Worker> selectByCommunityId(Integer communityId);
 }

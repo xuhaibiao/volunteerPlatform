@@ -3,10 +3,10 @@ package cn.xhb.volunteerplatform.dto;
 import lombok.Data;
 
 /**
- * worker审核报名请求
+ * worker审核活动报名请求
  */
 @Data
-public class ExamineRequest {
+public class ExamineActivityRequest {
 
     private Integer recordId;
 }
