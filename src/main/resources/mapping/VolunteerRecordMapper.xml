@@ -13,6 +13,15 @@
     <result column="delete_time" property="deleteTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
+
+  <resultMap id="volunteers" type="cn.xhb.volunteerplatform.entity.Volunteer" >
+  </resultMap>
+
+  <resultMap id="volunteerEvaluateInfo" type="cn.xhb.volunteerplatform.dto.WorkerGetVolunteerEvaluateInfoResponse" >
+
+  </resultMap>
+
+
   <sql id="Base_Column_List" >
     id, volunteer_id, activity_id, status, volunteer_evaluate_content, worker_evaluate, create_time,
     delete_time,volunteer_evaluate_score,update_time
@@ -26,7 +35,7 @@
   <select id="countByActivity"  resultType="java.lang.Integer" parameterType="java.lang.Integer" >
     select count(*)
     from volunteer_record
-    where activity_id = #{activityId,jdbcType=INTEGER}
+    where activity_id = #{activityId,jdbcType=INTEGER} and status != 1
   </select>
   <select id="countByVolunteerIdAndActivityId"  resultType="java.lang.Integer" >
     select count(*)
@@ -60,6 +69,25 @@
     from volunteer_record
     where activity_id = #{activityId,jdbcType=INTEGER} and status in (#{status1,jdbcType=INTEGER},#{status2,jdbcType=INTEGER})
   </select>
+
+  <select id="selectVolunteerInfoByActivityId" resultMap="volunteers">
+    select b.*
+    from volunteer_record as a, volunteer as b
+    where a.volunteer_id = b.id and a.activity_id = #{activityId,jdbcType=INTEGER} and status in (2, 3)
+  </select>
+
+  <select id="selectVolunteerEvaluateInfoByActivityId" resultMap="volunteerEvaluateInfo">
+    select b.id,b.name,b.gender,a.volunteer_evaluate_score,a.volunteer_evaluate_content
+    from volunteer_record as a, volunteer as b
+    where a.volunteer_id = b.id and a.activity_id = #{activityId,jdbcType=INTEGER} and status > 3;
+
+  </select>
+
+
+
+
+
+
 
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >

@@ -5,6 +5,8 @@ public interface RecordConstant {
 
     /**
      * 记录状态
+     * 0：报名审核中，1：报名未通过(志愿者取消或者工作者拒绝），2：报名通过，3：志愿进行中，4：志愿结束待评价，
+     * 5：志愿者已评价但工作者未评价，6：工作者已评价但志愿者未评价，7：全部已评价，8：该记录涉及活动已被删除
      */
     int REGISTRATION_REVIEWING = 0;
     int REGISTRATION_FAILED =1;

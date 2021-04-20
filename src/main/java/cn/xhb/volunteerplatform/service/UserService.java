@@ -2,10 +2,7 @@ package cn.xhb.volunteerplatform.service;
 
 import cn.xhb.volunteerplatform.constant.ActivityConstant;
 import cn.xhb.volunteerplatform.constant.RecordConstant;
-import cn.xhb.volunteerplatform.dto.ActivityResponse;
-import cn.xhb.volunteerplatform.dto.NeedEvaluateRecordsResponse;
-import cn.xhb.volunteerplatform.dto.ReviewTableResponse;
-import cn.xhb.volunteerplatform.dto.VolunteerRecordResponse;
+import cn.xhb.volunteerplatform.dto.*;
 import cn.xhb.volunteerplatform.entity.*;
 import cn.xhb.volunteerplatform.mapper.*;
 import org.springframework.stereotype.Service;
@@ -201,4 +198,34 @@ public class UserService {
     }
 
 
+    /**
+     * 获取参加该活动的志愿者列表
+     * @param activityId
+     * @return
+     */
+    public List<Volunteer> getVolunteerInfoByActivityId(Integer activityId) {
+        List<Volunteer> volunteers = volunteerRecordMapper.selectVolunteerInfoByActivityId(activityId);
+        return volunteers;
+    }
+
+    /**
+     * 获取志愿者对该活动的评价列表
+     * @param activityId
+     * @return
+     */
+    public List<WorkerGetVolunteerEvaluateInfoResponse> getVolunteerEvaluateInfoByActivityId(Integer activityId) {
+        List<WorkerGetVolunteerEvaluateInfoResponse> infos = volunteerRecordMapper.selectVolunteerEvaluateInfoByActivityId(activityId);
+        return infos;
+    }
+
+    /**
+     * 取消报名
+     * @param volunteerRecord
+     * @return
+     */
+    public int cancelSignUp(VolunteerRecord volunteerRecord) {
+        volunteerRecord.setStatus(RecordConstant.REGISTRATION_FAILED);
+        return volunteerRecordMapper.updateByPrimaryKeySelective(volunteerRecord);
+
+    }
 }

@@ -60,8 +60,7 @@ public class MessageService {
     }
 
     /**
-     * 志愿者消息获取 todo:
-     * @param volunteerId
+     * 志愿者消息获取
      * @param communityId
      * @return
      */
@@ -78,4 +77,29 @@ public class MessageService {
         return m;
 
     }
+
+    /**
+     * 添加志愿者取消报名消息
+     *
+     * @param activityId
+     * @param activityName
+     * @param communityId
+     * @param volunteerName
+     * @param volunteerIdCard
+     * @return
+     */
+    public int addCancelSignUpMsg(Integer activityId, String activityName, Integer communityId, String volunteerName, String volunteerIdCard, Integer volunteerId) {
+        Message message = new Message();
+        message.setStatus(0);
+        message.setSender(volunteerId);
+        message.setRecipient(communityId);
+        message.setType(MessageConstant.CANCEL_SIGNUP_TYPE);
+        message.setTitle("【取消报名通知】志愿者[" + volunteerName + "]取消[" + activityName + "]活动报名");
+        message.setContent("志愿者：" + volunteerName + "取消[" + activityName + "]活动报名，活动编号为：" + activityId + "，其身份证号为：" + volunteerIdCard);
+        message.setCreateTime(new Date());
+        return messageMapper.insertSelective(message);
+    }
+
+
+
 }

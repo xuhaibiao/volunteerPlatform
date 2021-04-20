@@ -43,7 +43,7 @@
     from message
     where
     recipient in (#{communityId,jdbcType=INTEGER},0) and
-    type in (1,2,4)
+    type != 5
     order by create_time desc
 
   </select>
@@ -56,8 +56,6 @@
     type = 5
     order by create_time desc
   </select>
-
-
 
 
 

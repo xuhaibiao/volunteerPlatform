@@ -59,6 +59,7 @@ public class ActivityService {
             } else {
                 activityResponse.setActivityStatus(ActivityConstant.ACITVITY_OVER);
             }
+            // 已报名的人数（不包括取消报名或者被拒绝的人数，即不包括记录状态为1的记录数)
             int signedUpCount = volunteerRecordMapper.countByActivity(activity.getId());
             activityResponse.setHasRecruitedNumber(signedUpCount);
             // 获取该活动已经报名审核通过的人数

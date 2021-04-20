@@ -1,12 +1,14 @@
 package cn.xhb.volunteerplatform.controller;
 
 import cn.xhb.volunteerplatform.constant.ActivityConstant;
+import cn.xhb.volunteerplatform.constant.RecordConstant;
 import cn.xhb.volunteerplatform.dto.*;
 import cn.xhb.volunteerplatform.entity.CommunityOrganization;
 import cn.xhb.volunteerplatform.entity.Volunteer;
 import cn.xhb.volunteerplatform.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -90,6 +92,29 @@ public class VolunteerController {
     @PostMapping("/record/evaluate")
     public Result<Object> evaluate(@RequestBody VolunteerEvaluateRequest evaluateRequest){
         int i = evaluateService.volunteerEvaluate(evaluateRequest.getScore(), evaluateRequest.getContent(), evaluateRequest.getRecordId(), evaluateRequest.getRecordStatus());
+        if (i > 0) {
+            return Result.success(null);
+        } else {
+            return Result.error();
+        }
+    }
+
+    @PostMapping("/record/cancelSignUp")
+    public Result<Object> cancelSignUp(@RequestBody VolunteerCancelSignUpRequest volunteerCancelSignUpRequest){
+        // 报名已经通过的前提下，需要发送取消报名消息，todo：后期可以加上惩罚措施
+        if (volunteerCancelSignUpRequest.getVolunteerRecord().getStatus() == RecordConstant.REGISTRATION_PASSED) {
+            Volunteer v = userService.getVolunteerById(volunteerCancelSignUpRequest.getVolunteerRecord().getVolunteerId());
+            String volunteerName = v.getName();
+            String volunteerIdCard = v.getIdCard();
+            Integer volunteerId = v.getId();
+
+            int k = messageService.addCancelSignUpMsg(volunteerCancelSignUpRequest.getActivityId(), volunteerCancelSignUpRequest.getActivityName()
+                    , volunteerCancelSignUpRequest.getCommunityId(), volunteerName, volunteerIdCard, volunteerId);
+            if (k == 0) {
+                return Result.error();
+            }
+        }
+        int i = userService.cancelSignUp(volunteerCancelSignUpRequest.getVolunteerRecord());
         if (i > 0) {
             return Result.success(null);
         } else {

@@ -33,7 +33,7 @@ public class ActivityResponse {
     private Integer recruitNumber;
 
     /**
-     * 已招募人数
+     * 已招募(报名）人数
      */
     private Integer hasRecruitedNumber;
 

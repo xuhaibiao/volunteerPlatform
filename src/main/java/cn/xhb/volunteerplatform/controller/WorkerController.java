@@ -42,6 +42,17 @@ public class WorkerController {
         return Result.success(rs);
     }
 
+    @GetMapping("/activity/volunteerInfo")
+    public Result<List<Volunteer>> getVolunteerInfo(@RequestParam("activityId") Integer activityId){
+        List<Volunteer> rs = userService.getVolunteerInfoByActivityId(activityId);
+        return Result.success(rs);
+    }
+
+    @GetMapping("/activity/volunteerEvaluateInfo")
+    public Result<List<WorkerGetVolunteerEvaluateInfoResponse>> getVolunteerEvaluateInfo(@RequestParam("activityId") Integer activityId){
+        List<WorkerGetVolunteerEvaluateInfoResponse> rs = userService.getVolunteerEvaluateInfoByActivityId(activityId);
+        return Result.success(rs);
+    }
 
 
     @GetMapping("/activity/search")
