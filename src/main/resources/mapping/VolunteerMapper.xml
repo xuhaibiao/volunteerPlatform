@@ -28,6 +28,25 @@
     where  community_id = #{communityId,jdbcType=INTEGER}
   </select>
 
+  <select id="selectAll" resultMap="BaseResultMap"  >
+    select
+    <include refid="Base_Column_List" />
+    from volunteer
+  </select>
+
+  <select id="countByYear" resultType="java.lang.Integer"  parameterType="java.lang.Integer" >
+    select count(*)
+    from volunteer
+    where YEAR(create_time) &lt;= #{year,jdbcType=INTEGER} and ban_status = 0
+  </select>
+
+  <select id="countByGender" resultType="java.lang.Integer"  parameterType="java.lang.Integer" >
+    select count(*)
+    from volunteer
+    where gender = #{gender,jdbcType=INTEGER} and ban_status = 0
+  </select>
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from volunteer
     where id = #{id,jdbcType=INTEGER}

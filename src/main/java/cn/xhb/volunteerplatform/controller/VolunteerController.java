@@ -188,8 +188,9 @@ public class VolunteerController {
     }
 
     @GetMapping("/message")
-    public Result<MessageResponse> getMessages(@RequestParam("communityId") Integer communityId) {
-        MessageResponse rs = messageService.getVolunteerMessages(communityId);
+    public Result<MessageResponse> getMessages(@RequestParam("volunteerId") Integer volunteerId) {
+        Volunteer v = userService.getVolunteerById(volunteerId);
+        MessageResponse rs = messageService.getVolunteerMessages(v);
         return Result.success(rs);
     }
 

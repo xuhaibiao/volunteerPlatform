@@ -18,7 +18,6 @@ public class Volunteer extends BaseUser{
 
     private String address;
 
-
     private Integer communityId;
 
     private Date deleteTime;

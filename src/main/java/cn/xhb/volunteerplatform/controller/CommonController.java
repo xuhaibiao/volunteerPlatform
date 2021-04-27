@@ -4,10 +4,13 @@ package cn.xhb.volunteerplatform.controller;
 import cn.xhb.volunteerplatform.dto.InformationEditRequest;
 import cn.xhb.volunteerplatform.dto.LoginRequest;
 import cn.xhb.volunteerplatform.dto.Result;
+import cn.xhb.volunteerplatform.dto.StatisticsDataResponse;
+import cn.xhb.volunteerplatform.dto.vo.FiveYearNumberVo;
 import cn.xhb.volunteerplatform.entity.Administrator;
 import cn.xhb.volunteerplatform.entity.BaseUser;
 import cn.xhb.volunteerplatform.entity.Volunteer;
 import cn.xhb.volunteerplatform.entity.Worker;
+import cn.xhb.volunteerplatform.service.StatisticsService;
 import cn.xhb.volunteerplatform.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,8 @@ public class CommonController {
 
     @Resource
     UserService userService;
+    @Resource
+    StatisticsService statisticsService;
 
     @PostMapping("/login")
     public Result<BaseUser> login(@RequestBody LoginRequest loginRequest) {
@@ -100,6 +105,20 @@ public class CommonController {
         }
 
     }
+
+    @GetMapping("/statistics")
+    public Result<StatisticsDataResponse> getStatisticsData() {
+        StatisticsDataResponse statisticsDataResponse = new StatisticsDataResponse();
+        FiveYearNumberVo f = statisticsService.getNumInFiveYear();
+        int[] sexRatio = statisticsService.getSexRatio();
+
+        statisticsDataResponse.setFiveYearNumberVo(f);
+        statisticsDataResponse.setSexRatio(sexRatio);
+
+
+        return Result.success(statisticsDataResponse);
+    }
+
 
 
 

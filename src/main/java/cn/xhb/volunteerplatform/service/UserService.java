@@ -74,7 +74,7 @@ public class UserService {
             Activity activity = activityMapper.selectByPrimaryKey(activityId);
             Date now = new Date();
             // 记录状态
-            if (activity.getHasDeleted() == 1) {
+            if (activity.getHasDeleted() == 1 ) {
                 volunteerRecord.setStatus(RecordConstant.ACTIVITY_HAS_DELETED);
             }else if (activity.getActivityBeginTime().before(now) && activity.getActivityEndTime().after(now) && volunteerRecord.getStatus() == ActivityConstant.SIGNED_UP_SUCCESS) {
                 volunteerRecord.setStatus(RecordConstant.ACTIVITY_IN_PROGRESS);
@@ -227,5 +227,13 @@ public class UserService {
         volunteerRecord.setStatus(RecordConstant.REGISTRATION_FAILED);
         return volunteerRecordMapper.updateByPrimaryKeySelective(volunteerRecord);
 
+    }
+
+    public List<Volunteer> getAllVolunteer() {
+        return volunteerMapper.selectAll();
+    }
+
+    public List<Worker> getAllWorker() {
+        return workerMapper.selectAll();
     }
 }

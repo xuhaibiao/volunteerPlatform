@@ -118,6 +118,8 @@ public class CommunityService {
      * @return
      */
     public int agreeJoin(Integer volunteerId, Integer messageId,Integer communityId) {
+        CommunityOrganization community = this.getCommunity(communityId);
+        String communityName = community.getName();
         Message message = new Message();
         message.setId(messageId);
         message.setStatus(MessageConstant.PROCESSED);
@@ -132,7 +134,22 @@ public class CommunityService {
             volunteer.setCommunityId(communityId);
             int i = messageMapper.updateByPrimaryKeySelective(message);
             if (i > 0) {
-                return volunteerMapper.updateByPrimaryKeySelective(volunteer);
+                // 同意后给志愿者发送消息
+                Message msg = new Message();
+                msg.setType(MessageConstant.SYSTEM_TYPE);
+                msg.setSender(1);
+                msg.setRecipient(volunteerId);
+                msg.setTitle("【同意加入组织】"+communityName+" 社区已同意您加入组织");
+                msg.setContent("【同意加入组织】"+communityName+" 社区已同意您加入组织");
+                msg.setCreateTime(new Date());
+                msg.setStatus(0);
+                int i1 = messageMapper.insertSelective(msg);
+                if (i1 > 0) {
+                    return volunteerMapper.updateByPrimaryKeySelective(volunteer);
+                } else {
+                    return 0;
+                }
+
             } else {
                 return 0;
             }
@@ -143,15 +160,34 @@ public class CommunityService {
 
     /**
      * 工作者拒绝加入组织
+     * @param volunteerId
      * @param messageId
+     * @param communityId
      * @return
      */
-    public int refuseJoin(Integer messageId) {
+    public int refuseJoin(Integer volunteerId, Integer messageId,Integer communityId) {
+        CommunityOrganization community = this.getCommunity(communityId);
+        String communityName = community.getName();
         Message message = new Message();
         message.setId(messageId);
         message.setStatus(MessageConstant.PROCESSED);
         message.setUpdateTime(new Date());
-        return messageMapper.updateByPrimaryKeySelective(message);
+        int i = messageMapper.updateByPrimaryKeySelective(message);
+        if (i > 0) {
+            // 拒绝后给志愿者发送消息
+            Message msg = new Message();
+            msg.setType(MessageConstant.SYSTEM_TYPE);
+            msg.setSender(1);
+            msg.setRecipient(volunteerId);
+            msg.setTitle("【拒绝加入组织】"+communityName+" 社区拒绝您加入组织");
+            msg.setContent("【拒绝加入组织】"+communityName+" 社区拒绝您加入组织");
+            msg.setCreateTime(new Date());
+            msg.setStatus(0);
+            return messageMapper.insertSelective(msg);
+
+        } else {
+            return 0;
+        }
     }
 
 

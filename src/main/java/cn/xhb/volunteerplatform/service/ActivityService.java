@@ -137,6 +137,7 @@ public class ActivityService {
         activity.setRecruitEndTime(addActivityRquest.getRecruitDateRange()[1]);
         activity.setCreateTime(new Date());
         activity.setWorkerId(addActivityRquest.getWorker().getId());
+        activity.setBanStatus(0);
         if ("本社区".equals(addActivityRquest.getRecruitRange())) {
             activity.setRecruitRange(0);
         } else {
@@ -164,8 +165,11 @@ public class ActivityService {
     }
 
 
+    public List<Activity> getAllActivity() {
+        return activityMapper.selectAll();
+    }
 
-
-
-
+    public int updateActivity(Activity activity) {
+        return activityMapper.updateByPrimaryKeySelective(activity);
+    }
 }

@@ -13,6 +13,8 @@ public interface VolunteerMapper {
 
     int insertSelective(Volunteer record);
 
+    List<Volunteer> selectAll();
+
     Volunteer selectByPrimaryKey(Integer id);
 
     Volunteer selectByIdCard(String idCard);
@@ -22,4 +24,8 @@ public interface VolunteerMapper {
     int updateByPrimaryKey(Volunteer record);
 
     List<Volunteer> selectByCommunityId(Integer communityId);
+
+    int countByYear(int year);
+
+    int countByGender(int gender);
 }

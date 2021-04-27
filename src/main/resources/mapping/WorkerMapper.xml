@@ -27,6 +27,14 @@
     where  community_id = #{communityId,jdbcType=INTEGER}
   </select>
 
+  <select id="selectAll" resultMap="BaseResultMap"  >
+    select
+    <include refid="Base_Column_List" />
+    from worker
+  </select>
+
+
+
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from worker
     where id = #{id,jdbcType=INTEGER}

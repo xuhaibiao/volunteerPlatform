@@ -42,5 +42,7 @@ public class Activity {
 
     private String content;
 
+    private Integer banStatus;
+
 
 }

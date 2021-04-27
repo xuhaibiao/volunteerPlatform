@@ -22,4 +22,6 @@ public interface WorkerMapper {
     int updateByPrimaryKey(Worker record);
 
     List<Worker> selectByCommunityId(Integer communityId);
+
+    List<Worker> selectAll();
 }

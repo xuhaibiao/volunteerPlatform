@@ -24,5 +24,11 @@ public interface MessageMapper {
 
     List<Message> selectWorkerCommunityMessageByRecipient(Integer communityId);
 
-    List<Message> selectSystemMessage();
+    List<Message> selectVolunteerCommunityMessageByRecipient(Integer volunteerId);
+
+    List<Message> selectSystemMessageByVolunteer(Integer recipient);
+
+    List<Message> selectSystemMessageByWorker(Integer recipient);
+
+    List<Message> selectAll();
 }

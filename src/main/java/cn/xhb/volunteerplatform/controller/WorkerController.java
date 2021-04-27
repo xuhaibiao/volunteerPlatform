@@ -162,6 +162,7 @@ public class WorkerController {
     public Result<Object> agreeJoinCommunity(@RequestBody  Message message){
         int i = communityService.agreeJoin(message.getSender(), message.getId(),message.getRecipient());
         if (i > 0) {
+
             return Result.success(null);
         } else if (i == -1) {
             return Result.error("该志愿者已加入其他社区组织！","-1");
@@ -172,7 +173,7 @@ public class WorkerController {
 
     @PostMapping("/community/refuseJoin")
     public Result<Object> refuseJoinCommunity(@RequestBody Message message){
-        int i = communityService.refuseJoin(message.getId());
+        int i = communityService.refuseJoin(message.getSender(), message.getId(),message.getRecipient());
         if (i > 0) {
             return Result.success(null);
         } else {

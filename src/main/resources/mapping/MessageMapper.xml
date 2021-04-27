@@ -36,6 +36,7 @@
       type = #{type,jdbcType=INTEGER} and
     </if>
     status = 0
+    order by create_time desc
   </select>
   <select id="selectWorkerCommunityMessageByRecipient" resultMap="BaseResultMap" parameterType="java.lang.Integer">
     select
@@ -48,15 +49,38 @@
 
   </select>
 
-  <select id="selectSystemMessage" resultMap="BaseResultMap">
+  <select id="selectSystemMessageByVolunteer" resultMap="BaseResultMap">
     select
     <include refid="Base_Column_List" />
     from message
     where
+    ((sender = 1 and recipient in (#{recipient,jdbcType=INTEGER},0))
+    or
+    sender = 0)
+    and
     type = 5
     order by create_time desc
   </select>
 
+  <select id="selectSystemMessageByWorker" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from message
+    where
+    ((sender = 2 and recipient in (#{recipient,jdbcType=INTEGER},0))
+    or
+    sender = 0)
+    and
+    type = 5
+    order by create_time desc
+  </select>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from message
+    order by create_time desc
+  </select>
 
 
 
