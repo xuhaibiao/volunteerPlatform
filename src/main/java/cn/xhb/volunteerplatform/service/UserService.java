@@ -55,6 +55,14 @@ public class UserService {
         return administratorMapper.updateByPrimaryKeySelective(administrator);
     }
 
+    public int addVolunteer(Volunteer volunteer) {
+        return volunteerMapper.insertSelective(volunteer);
+    }
+
+    public int addWorker(Worker worker) {
+        return workerMapper.insertSelective(worker);
+
+    }
 
     public Worker getWorkerByIdCard(String idCard) {
         return workerMapper.selectByIdCard(idCard);
@@ -236,4 +244,6 @@ public class UserService {
     public List<Worker> getAllWorker() {
         return workerMapper.selectAll();
     }
+
+
 }

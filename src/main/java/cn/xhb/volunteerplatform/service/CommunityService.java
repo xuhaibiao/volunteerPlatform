@@ -4,10 +4,17 @@ import cn.xhb.volunteerplatform.constant.MessageConstant;
 import cn.xhb.volunteerplatform.dto.CommunitySearchQuery;
 import cn.xhb.volunteerplatform.dto.JoinListResponse;
 import cn.xhb.volunteerplatform.dto.JoinRequest;
+import cn.xhb.volunteerplatform.dto.LoadAllCommunityResponse;
+import cn.xhb.volunteerplatform.dto.vo.VolunteerListVo;
+import cn.xhb.volunteerplatform.dto.vo.WorkerListVo;
 import cn.xhb.volunteerplatform.entity.CommunityOrganization;
 import cn.xhb.volunteerplatform.entity.Message;
 import cn.xhb.volunteerplatform.entity.Volunteer;
-import cn.xhb.volunteerplatform.mapper.*;
+import cn.xhb.volunteerplatform.entity.Worker;
+import cn.xhb.volunteerplatform.mapper.CommunityOrganizationMapper;
+import cn.xhb.volunteerplatform.mapper.MessageMapper;
+import cn.xhb.volunteerplatform.mapper.VolunteerMapper;
+import cn.xhb.volunteerplatform.mapper.WorkerMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,6 +31,8 @@ public class CommunityService {
     MessageMapper messageMapper;
     @Resource
     VolunteerMapper volunteerMapper;
+    @Resource
+    WorkerMapper workerMapper;
 
     public List<CommunityOrganization> getNotDeletedCommunities() {
         return communityOrganizationMapper.selectNotDeleted();
@@ -40,20 +49,36 @@ public class CommunityService {
     /**
      * 工作者获取申请加入组织列表
      * @param communityId
-     * @param type
      * @return
      */
-    public List<JoinListResponse> getNotDealJoinList(Integer communityId, Integer type) {
-        List<Message> messages = messageMapper.selectNotDealBySenderAndRecipientAndType(null, communityId, type);
-        List<JoinListResponse> rs = new ArrayList<>();
-        for (Message message : messages) {
-            JoinListResponse tmp = new JoinListResponse();
+    public JoinListResponse getNotDealJoinList(Integer communityId) {
+
+        List<Message> volunteerJoinMessages = messageMapper.selectNotDealBySenderAndRecipientAndType(null, communityId, MessageConstant.JOIN_COMMUNITY_TYPE);
+        List<Message> workerJoinMessages = messageMapper.selectNotDealBySenderAndRecipientAndType(null, communityId, MessageConstant.WORKER_JOIN_COMMUNITY_TYPE);
+        JoinListResponse rs = new JoinListResponse();
+        List<VolunteerListVo> volunteerJoinListVo = new ArrayList<>();
+        List<WorkerListVo> workerJoinListVo = new ArrayList<>();
+        for (Message message : volunteerJoinMessages) {
+            // 如果是志愿者申请加入
+            VolunteerListVo tmp = new VolunteerListVo();
             Integer volunteerId = message.getSender();
             Volunteer volunteer = volunteerMapper.selectByPrimaryKey(volunteerId);
             tmp.setVolunteer(volunteer);
             tmp.setMessage(message);
-            rs.add(tmp);
+            volunteerJoinListVo.add(tmp);
+
         }
+        for (Message message : workerJoinMessages) {
+            // 如果是工作者申请加入
+            WorkerListVo tmp = new WorkerListVo();
+            Integer workerId = message.getSender();
+            Worker worker = workerMapper.selectByPrimaryKey(workerId);
+            tmp.setWorker(worker);
+            tmp.setMessage(message);
+            workerJoinListVo.add(tmp);
+        }
+        rs.setVolunteerJoinList(volunteerJoinListVo);
+        rs.setWorkerJoinList(workerJoinListVo);
         return rs;
     }
 
@@ -75,7 +100,7 @@ public class CommunityService {
             message.setSender(volunteer.getId());
             message.setRecipient(communityId);
             message.setType(MessageConstant.JOIN_COMMUNITY_TYPE);
-            message.setTitle("【加入组织申请】志愿者"+volunteer.getName()+"申请加入组织");
+            message.setTitle("【志愿者加入组织申请】志愿者"+volunteer.getName()+"申请加入组织");
             message.setContent("志愿者：" + volunteer.getName() + "申请加入组织，其身份证号为：" + volunteer.getIdCard());
             message.setStatus(MessageConstant.UNPROCESSED);
             return messageMapper.insertSelective(message);
@@ -94,7 +119,7 @@ public class CommunityService {
         v.setId(id);
         v.setCommunityId(0);
         Message message = new Message();
-        message.setTitle("【退出组织】志愿者" + name + "退出组织");
+        message.setTitle("【志愿者退出组织】志愿者" + name + "退出组织");
         message.setContent("志愿者：" + name + "退出组织，其身份证号为：" + idCard);
         message.setCreateTime(new Date());
         message.setType(MessageConstant.QUIT_COMMUNITY_TYPE);
@@ -110,62 +135,76 @@ public class CommunityService {
 
     }
 
-
     /**
      * 工作者同意加入组织
-     * @param volunteerId
+     * @param sender
      * @param messageId
+     * @param communityId
+     * @param type
      * @return
      */
-    public int agreeJoin(Integer volunteerId, Integer messageId,Integer communityId) {
+    public int agreeJoin(Integer sender, Integer messageId, Integer communityId, Integer type) {
+
         CommunityOrganization community = this.getCommunity(communityId);
         String communityName = community.getName();
         Message message = new Message();
         message.setId(messageId);
         message.setStatus(MessageConstant.PROCESSED);
         message.setUpdateTime(new Date());
-        Volunteer v = volunteerMapper.selectByPrimaryKey(volunteerId);
-        // 志愿者多个申请情况，此工作者同意之前已有其他社区组织同意
-        if (v.getCommunityId() != 0) {
-            return -1;
-        } else {
-            Volunteer volunteer = new Volunteer();
-            volunteer.setId(volunteerId);
-            volunteer.setCommunityId(communityId);
+        if (type == MessageConstant.WORKER_JOIN_COMMUNITY_TYPE) {
+            Worker worker = new Worker();
+            worker.setId(sender);
+            worker.setCommunityId(communityId);
             int i = messageMapper.updateByPrimaryKeySelective(message);
             if (i > 0) {
-                // 同意后给志愿者发送消息
-                Message msg = new Message();
-                msg.setType(MessageConstant.SYSTEM_TYPE);
-                msg.setSender(1);
-                msg.setRecipient(volunteerId);
-                msg.setTitle("【同意加入组织】"+communityName+" 社区已同意您加入组织");
-                msg.setContent("【同意加入组织】"+communityName+" 社区已同意您加入组织");
-                msg.setCreateTime(new Date());
-                msg.setStatus(0);
-                int i1 = messageMapper.insertSelective(msg);
-                if (i1 > 0) {
-                    return volunteerMapper.updateByPrimaryKeySelective(volunteer);
-                } else {
-                    return 0;
-                }
-
+                return workerMapper.updateByPrimaryKeySelective(worker);
             } else {
                 return 0;
             }
+        } else {
+            Volunteer v = volunteerMapper.selectByPrimaryKey(sender);
+            // 志愿者多个申请情况，此工作者同意之前已有其他社区组织同意
+            if (v.getCommunityId() != 0) {
+                return -1;
+            } else {
+                Volunteer volunteer = new Volunteer();
+                volunteer.setId(sender);
+                volunteer.setCommunityId(communityId);
+                int i = messageMapper.updateByPrimaryKeySelective(message);
+                if (i > 0) {
+                    // 同意后给志愿者发送消息
+                    Message msg = new Message();
+                    msg.setType(MessageConstant.SYSTEM_TYPE);
+                    msg.setSender(1);
+                    msg.setRecipient(sender);
+                    msg.setTitle("【同意加入组织】" + communityName + " 社区已同意您加入组织");
+                    msg.setContent("【同意加入组织】" + communityName + " 社区已同意您加入组织");
+                    msg.setCreateTime(new Date());
+                    msg.setStatus(0);
+                    int i1 = messageMapper.insertSelective(msg);
+                    if (i1 > 0) {
+                        return volunteerMapper.updateByPrimaryKeySelective(volunteer);
+                    } else {
+                        return 0;
+                    }
+
+                } else {
+                    return 0;
+                }
+            }
         }
-
-
     }
+
 
     /**
      * 工作者拒绝加入组织
-     * @param volunteerId
+     * @param sender
      * @param messageId
      * @param communityId
+     * @param type
      * @return
      */
-    public int refuseJoin(Integer volunteerId, Integer messageId,Integer communityId) {
+    public int refuseJoin(Integer sender, Integer messageId,Integer communityId, Integer type) {
         CommunityOrganization community = this.getCommunity(communityId);
         String communityName = community.getName();
         Message message = new Message();
@@ -174,16 +213,21 @@ public class CommunityService {
         message.setUpdateTime(new Date());
         int i = messageMapper.updateByPrimaryKeySelective(message);
         if (i > 0) {
-            // 拒绝后给志愿者发送消息
-            Message msg = new Message();
-            msg.setType(MessageConstant.SYSTEM_TYPE);
-            msg.setSender(1);
-            msg.setRecipient(volunteerId);
-            msg.setTitle("【拒绝加入组织】"+communityName+" 社区拒绝您加入组织");
-            msg.setContent("【拒绝加入组织】"+communityName+" 社区拒绝您加入组织");
-            msg.setCreateTime(new Date());
-            msg.setStatus(0);
-            return messageMapper.insertSelective(msg);
+            if (type == MessageConstant.WORKER_JOIN_COMMUNITY_TYPE) {
+                // 如果拒绝工作者加入，那么工作者注册失败，需要重新注册
+                return workerMapper.deleteByPrimaryKey(sender);
+            } else {
+                // 拒绝后给志愿者发送消息
+                Message msg = new Message();
+                msg.setType(MessageConstant.SYSTEM_TYPE);
+                msg.setSender(1);
+                msg.setRecipient(sender);
+                msg.setTitle("【拒绝加入组织】"+communityName+" 社区拒绝您加入组织");
+                msg.setContent("【拒绝加入组织】"+communityName+" 社区拒绝您加入组织");
+                msg.setCreateTime(new Date());
+                msg.setStatus(0);
+                return messageMapper.insertSelective(msg);
+            }
 
         } else {
             return 0;
@@ -191,7 +235,14 @@ public class CommunityService {
     }
 
 
-
-
-
+    public List<LoadAllCommunityResponse> getAllNotDelCommunity() {
+        List<CommunityOrganization> communityOrganizations = communityOrganizationMapper.selectNotDeleted();
+        List<LoadAllCommunityResponse> rs = new ArrayList<>(communityOrganizations.size());
+        for (CommunityOrganization communityOrganization : communityOrganizations) {
+            LoadAllCommunityResponse tmp = new LoadAllCommunityResponse();
+            tmp.setValue(communityOrganization.getName() + "(编号:" + communityOrganization.getId() + ")");
+            rs.add(tmp);
+        }
+        return rs;
+    }
 }

@@ -1,18 +1,22 @@
 package cn.xhb.volunteerplatform.dto;
 
-import cn.xhb.volunteerplatform.entity.Message;
-import cn.xhb.volunteerplatform.entity.Volunteer;
+import cn.xhb.volunteerplatform.dto.vo.VolunteerListVo;
+import cn.xhb.volunteerplatform.dto.vo.WorkerListVo;
 import lombok.Data;
 
-
+import java.util.List;
 
 
 @Data
 public class JoinListResponse {
 
-    public Volunteer volunteer;
+    private List<VolunteerListVo> volunteerJoinList;
 
-    public Message message;
+    private List<WorkerListVo> workerJoinList;
 
 
 }
+
+
+
+

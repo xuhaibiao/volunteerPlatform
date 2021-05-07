@@ -20,7 +20,9 @@ spring:
     testOnReturn: false
     filters: stat,wall,log4j
     logSlowSql: true
-
+  servlet:
+    multipart:
+      max-file-size: 100MB
 
 mybatis:
   mapper-locations: classpath:mapping/*.xml

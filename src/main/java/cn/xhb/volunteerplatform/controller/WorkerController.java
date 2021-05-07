@@ -1,7 +1,6 @@
 package cn.xhb.volunteerplatform.controller;
 
 
-import cn.xhb.volunteerplatform.constant.MessageConstant;
 import cn.xhb.volunteerplatform.dto.*;
 import cn.xhb.volunteerplatform.entity.CommunityOrganization;
 import cn.xhb.volunteerplatform.entity.Message;
@@ -153,16 +152,15 @@ public class WorkerController {
     }
 
     @GetMapping("/community/joinList")
-    public Result<List<JoinListResponse>> getJoinList(@RequestParam("communityId") Integer communityId) {
-        List<JoinListResponse> rs = communityService.getNotDealJoinList(communityId, MessageConstant.JOIN_COMMUNITY_TYPE);
+    public Result<JoinListResponse> getJoinList(@RequestParam("communityId") Integer communityId) {
+        JoinListResponse rs = communityService.getNotDealJoinList(communityId);
         return Result.success(rs);
     }
 
     @PostMapping("/community/agreeJoin")
     public Result<Object> agreeJoinCommunity(@RequestBody  Message message){
-        int i = communityService.agreeJoin(message.getSender(), message.getId(),message.getRecipient());
+        int i = communityService.agreeJoin(message.getSender(), message.getId(), message.getRecipient(), message.getType());
         if (i > 0) {
-
             return Result.success(null);
         } else if (i == -1) {
             return Result.error("该志愿者已加入其他社区组织！","-1");
@@ -173,7 +171,7 @@ public class WorkerController {
 
     @PostMapping("/community/refuseJoin")
     public Result<Object> refuseJoinCommunity(@RequestBody Message message){
-        int i = communityService.refuseJoin(message.getSender(), message.getId(),message.getRecipient());
+        int i = communityService.refuseJoin(message.getSender(), message.getId(), message.getRecipient(), message.getType());
         if (i > 0) {
             return Result.success(null);
         } else {
