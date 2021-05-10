@@ -3,10 +3,7 @@ package cn.xhb.volunteerplatform.controller;
 
 import cn.xhb.volunteerplatform.dto.*;
 import cn.xhb.volunteerplatform.dto.vo.FiveYearNumberVo;
-import cn.xhb.volunteerplatform.entity.Administrator;
-import cn.xhb.volunteerplatform.entity.BaseUser;
-import cn.xhb.volunteerplatform.entity.Volunteer;
-import cn.xhb.volunteerplatform.entity.Worker;
+import cn.xhb.volunteerplatform.entity.*;
 import cn.xhb.volunteerplatform.service.CommunityService;
 import cn.xhb.volunteerplatform.service.MessageService;
 import cn.xhb.volunteerplatform.service.StatisticsService;
@@ -64,8 +61,26 @@ public class CommonController {
         }
     }
 
+    @GetMapping("/testInsert")
+    public Integer test(){
+        Worker worker = new Worker();
+        worker.setIdCard("test");
+        worker.setName("test");
+        worker.setPassword("test");
+        worker.setPhone("test");
+        worker.setAddress("test");
+        worker.setGender(0);
+        worker.setCreateTime(new Date());
+        worker.setBanStatus(0);
+        // 需要等待社区发起人通过才能设置
+        worker.setCommunityId(-1);
+        // 返回主键id
+        int i = userService.addWorker(worker);
+        return worker.getId();
+    }
+
     @PostMapping("/signUp")
-    public Result<Object> login(@RequestBody SignUpRequest signUpRequest) {
+    public Result<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
 
         try {
             if (signUpRequest.getType() == 0) {
@@ -102,6 +117,7 @@ public class CommonController {
                 worker.setBanStatus(0);
                 // 需要等待社区发起人通过才能设置
                 worker.setCommunityId(-1);
+                // 返回主键id
                 int i = userService.addWorker(worker);
                 if (i > 0) {
                     // 解析加入的社区id
@@ -110,8 +126,7 @@ public class CommonController {
                     String cid = s.substring(0, s.length() - 1);
                     Integer communityId = Integer.valueOf(cid);
                     // 发送申请加入消息
-                    Worker w = userService.getWorkerByIdCard(signUpRequest.getIdCard());
-                    int k = messageService.addWorkerJoinCommunityMsg(w, communityId);
+                    int k = messageService.addWorkerJoinCommunityMsg(worker, communityId);
                     if (k > 0) {
                         return Result.success(null);
                     } else {
@@ -123,11 +138,41 @@ public class CommonController {
 
             } else {
                 // 注册社区工作者（创建社区）
+                // 先创建工作者实体
+                Worker worker = new Worker();
+                worker.setIdCard(signUpRequest.getIdCard());
+                worker.setName(signUpRequest.getUsername());
+                worker.setPassword(signUpRequest.getPassword());
+                worker.setPhone(signUpRequest.getPhone());
+                worker.setAddress(signUpRequest.getProvince() + signUpRequest.getCity() + signUpRequest.getArea() + signUpRequest.getDetailAddress());
+                worker.setGender(signUpRequest.getGender());
+                worker.setCreateTime(new Date());
+                worker.setBanStatus(0);
+                // 需要等待超级管理员审核通过才能设置
+                worker.setCommunityId(-1);
+                int i = userService.addWorker(worker);
+                if (i > 0) {
+                    //获取社区信息
+                    CommunityOrganization community = signUpRequest.getCommunity();
+                    community.setUndertaker(signUpRequest.getUsername());
+                    community.setCreateTime(new Date());
+                    community.setHasDeleted(0);
+                    int k = communityService.add(community);
+                    if (k > 0) {
+                        SignUpResponse signUpResponse = new SignUpResponse();
+                        signUpResponse.setCommunityId(community.getId());
+                        signUpResponse.setWorkerId(worker.getId());
+                        return Result.success(signUpResponse);
+                    } else {
+                        return Result.error("注册失败！");
+                    }
+                } else {
+                    return Result.error("注册失败！");
+                }
             }
         } catch (Exception e) {
             return Result.error("注册失败！"+e.getMessage());
         }
-        return Result.error("注册失败！");
     }
 
     @GetMapping("/loadAllCommunity")
@@ -207,6 +252,9 @@ public class CommonController {
 
     @PostMapping("/upload")
     public Result<String> upload(MultipartFile file, HttpServletRequest req) {
+        if (file == null) {
+            return Result.error("上传文件为空");
+        }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
         //再用pdf格式开始书写,先找原始的名字

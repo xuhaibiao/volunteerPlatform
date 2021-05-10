@@ -51,7 +51,7 @@
       #{banStatus,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{deleteTime,jdbcType=TIMESTAMP}
       )
   </insert>
-  <insert id="insertSelective" parameterType="cn.xhb.volunteerplatform.entity.Worker">
+  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="cn.xhb.volunteerplatform.entity.Worker">
     insert into worker
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">

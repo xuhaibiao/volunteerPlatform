@@ -245,4 +245,8 @@ public class CommunityService {
         }
         return rs;
     }
+
+    public int add(CommunityOrganization community) {
+        return communityOrganizationMapper.insertSelective(community);
+    }
 }
