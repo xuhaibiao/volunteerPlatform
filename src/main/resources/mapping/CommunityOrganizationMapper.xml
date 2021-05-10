@@ -6,17 +6,20 @@
     <result column="name" property="name" jdbcType="VARCHAR" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="detail_address" property="detailAddress" jdbcType="VARCHAR" />
-    <result column="undertaker" property="undertaker" jdbcType="VARCHAR" />
+    <result column="worker_id" property="workerId" jdbcType="INTEGER" />
     <result column="province" property="province" jdbcType="VARCHAR" />
     <result column="city" property="city" jdbcType="VARCHAR" />
     <result column="area" property="area" jdbcType="VARCHAR" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="has_deleted" property="hasDeleted" jdbcType="INTEGER" />
     <result column="delete_time" property="deleteTime" jdbcType="TIMESTAMP" />
+    <result column="has_approved" property="hasApproved" jdbcType="INTEGER" />
+    <result column="fileInfo" property="fileinfo" jdbcType="VARCHAR" />
+    <result column="undertaker" property="undertaker" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, name, create_time, detail_address, undertaker, province, city, area, update_time, 
-    has_deleted, delete_time
+    id, name, create_time, detail_address, worker_id, province, city, area, update_time, 
+    has_deleted, delete_time, has_approved, fileInfo, undertaker
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -24,11 +27,18 @@
     from community_organization
     where id = #{id,jdbcType=INTEGER}
   </select>
+
   <select id="selectNotDeleted" resultMap="BaseResultMap"  >
     select
     <include refid="Base_Column_List" />
     from community_organization
-    where has_deleted = 0
+    where has_deleted = 0 and has_approved = 1
+  </select>
+  <select id="selectNotApproved" resultMap="BaseResultMap"  >
+    select
+    <include refid="Base_Column_List" />
+    from community_organization
+    where has_approved = 0
   </select>
   <select id="selectNotDeletedBySearch" resultMap="BaseResultMap" parameterType="cn.xhb.volunteerplatform.dto.CommunitySearchQuery">
     select
@@ -49,9 +59,8 @@
     <if test="communitySearchQuery.communityName != null" >
       name like "%"#{communitySearchQuery.communityName}"%" and
     </if>
-    has_deleted = 0
+    has_deleted = 0 and has_approved = 1
   </select>
-
 
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from community_organization
@@ -59,15 +68,17 @@
   </delete>
   <insert id="insert" parameterType="cn.xhb.volunteerplatform.entity.CommunityOrganization" >
     insert into community_organization (id, name, create_time, 
-      detail_address, undertaker, province, 
+      detail_address, worker_id, province, 
       city, area, update_time, 
-      has_deleted, delete_time)
+      has_deleted, delete_time, has_approved, 
+      fileInfo, undertaker)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{detailAddress,jdbcType=VARCHAR}, #{undertaker,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, 
+      #{detailAddress,jdbcType=VARCHAR}, #{workerId,jdbcType=INTEGER}, #{province,jdbcType=VARCHAR}, 
       #{city,jdbcType=VARCHAR}, #{area,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{hasDeleted,jdbcType=INTEGER}, #{deleteTime,jdbcType=TIMESTAMP})
+      #{hasDeleted,jdbcType=INTEGER}, #{deleteTime,jdbcType=TIMESTAMP}, #{hasApproved,jdbcType=INTEGER}, 
+      #{fileinfo,jdbcType=VARCHAR}, #{undertaker,jdbcType=VARCHAR})
   </insert>
-  <insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" keyColumn="id" parameterType="cn.xhb.volunteerplatform.entity.CommunityOrganization" >
+  <insert id="insertSelective" parameterType="cn.xhb.volunteerplatform.entity.CommunityOrganization" >
     insert into community_organization
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -82,8 +93,8 @@
       <if test="detailAddress != null" >
         detail_address,
       </if>
-      <if test="undertaker != null" >
-        undertaker,
+      <if test="workerId != null" >
+        worker_id,
       </if>
       <if test="province != null" >
         province,
@@ -103,6 +114,15 @@
       <if test="deleteTime != null" >
         delete_time,
       </if>
+      <if test="hasApproved != null" >
+        has_approved,
+      </if>
+      <if test="fileinfo != null" >
+        fileInfo,
+      </if>
+      <if test="undertaker != null" >
+        undertaker,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -117,8 +137,8 @@
       <if test="detailAddress != null" >
         #{detailAddress,jdbcType=VARCHAR},
       </if>
-      <if test="undertaker != null" >
-        #{undertaker,jdbcType=VARCHAR},
+      <if test="workerId != null" >
+        #{workerId,jdbcType=INTEGER},
       </if>
       <if test="province != null" >
         #{province,jdbcType=VARCHAR},
@@ -138,6 +158,15 @@
       <if test="deleteTime != null" >
         #{deleteTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="hasApproved != null" >
+        #{hasApproved,jdbcType=INTEGER},
+      </if>
+      <if test="fileinfo != null" >
+        #{fileinfo,jdbcType=VARCHAR},
+      </if>
+      <if test="undertaker != null" >
+        #{undertaker,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="cn.xhb.volunteerplatform.entity.CommunityOrganization" >
@@ -152,8 +181,8 @@
       <if test="detailAddress != null" >
         detail_address = #{detailAddress,jdbcType=VARCHAR},
       </if>
-      <if test="undertaker != null" >
-        undertaker = #{undertaker,jdbcType=VARCHAR},
+      <if test="workerId != null" >
+        worker_id = #{workerId,jdbcType=INTEGER},
       </if>
       <if test="province != null" >
         province = #{province,jdbcType=VARCHAR},
@@ -173,6 +202,15 @@
       <if test="deleteTime != null" >
         delete_time = #{deleteTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="hasApproved != null" >
+        has_approved = #{hasApproved,jdbcType=INTEGER},
+      </if>
+      <if test="fileinfo != null" >
+        fileInfo = #{fileinfo,jdbcType=VARCHAR},
+      </if>
+      <if test="undertaker != null" >
+        undertaker = #{undertaker,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -181,13 +219,16 @@
     set name = #{name,jdbcType=VARCHAR},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       detail_address = #{detailAddress,jdbcType=VARCHAR},
-      undertaker = #{undertaker,jdbcType=VARCHAR},
+      worker_id = #{workerId,jdbcType=INTEGER},
       province = #{province,jdbcType=VARCHAR},
       city = #{city,jdbcType=VARCHAR},
       area = #{area,jdbcType=VARCHAR},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       has_deleted = #{hasDeleted,jdbcType=INTEGER},
-      delete_time = #{deleteTime,jdbcType=TIMESTAMP}
+      delete_time = #{deleteTime,jdbcType=TIMESTAMP},
+      has_approved = #{hasApproved,jdbcType=INTEGER},
+      fileInfo = #{fileinfo,jdbcType=VARCHAR},
+      undertaker = #{undertaker,jdbcType=VARCHAR}
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

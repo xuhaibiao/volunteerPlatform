@@ -24,4 +24,6 @@ public interface CommunityOrganizationMapper {
     int updateByPrimaryKey(CommunityOrganization record);
 
     List<CommunityOrganization> selectNotDeletedBySearch(@Param("communitySearchQuery") CommunitySearchQuery communitySearchQuery);
+
+    List<CommunityOrganization> selectNotApproved();
 }

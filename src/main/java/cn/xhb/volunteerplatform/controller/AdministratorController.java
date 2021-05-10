@@ -4,6 +4,7 @@ package cn.xhb.volunteerplatform.controller;
 import cn.xhb.volunteerplatform.dto.AdministratorAddMsgRequest;
 import cn.xhb.volunteerplatform.dto.ChangeActivityBanStatusRequest;
 import cn.xhb.volunteerplatform.dto.Result;
+import cn.xhb.volunteerplatform.dto.ReviewCommunitiesResponse;
 import cn.xhb.volunteerplatform.entity.*;
 import cn.xhb.volunteerplatform.service.ActivityService;
 import cn.xhb.volunteerplatform.service.CommunityService;
@@ -13,6 +14,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -45,6 +54,36 @@ public class AdministratorController {
         List<Activity> rs = activityService.getAllActivity();
         return Result.success(rs);
     }
+
+    @GetMapping("/communityReview")
+    public Result<List<ReviewCommunitiesResponse>> getNeedReviewCommunities() {
+        List<ReviewCommunitiesResponse> rs = communityService.getAllNeedReviewCommunities();
+        return Result.success(rs);
+    }
+
+    @PostMapping("/communityReview/agree")
+    public Result<Object> agree(@RequestBody CommunityOrganization community) {
+        int i = communityService.approved(community);
+        if (i > 0) {
+            return Result.success(null);
+        } else {
+            return Result.error("通过失败！");
+        }
+    }
+
+    @PostMapping("/communityReview/refuse")
+    public Result<Object> refuse(@RequestBody CommunityOrganization community) {
+        int i = communityService.refuseApproved(community);
+        if (i > 0) {
+            return Result.success(null);
+        } else {
+            return Result.error("驳回失败！");
+        }
+    }
+
+
+
+
 
     @GetMapping("/message")
     public Result<List<Message>> getAllMessage() {
@@ -101,6 +140,64 @@ public class AdministratorController {
             return Result.error();
         }
     }
+
+    @GetMapping("/download")
+    public void download(@RequestParam("fileName") String fileName, @RequestParam("fileDate") String fileDate, HttpServletRequest req, HttpServletResponse resp) {
+
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
+        OutputStream fos = null;
+        try {
+            String filePath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\fileData";
+            bis = new BufferedInputStream(new FileInputStream(filePath + "/" + fileDate + "/" + fileName));
+            fos = resp.getOutputStream();
+            bos = new BufferedOutputStream(fos);
+            setFileDownloadHeader(req, resp, fileName);
+            resp.setContentType("application/octet-stream");
+            resp.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8), "iso-8859-1"));
+            int byteRead = 0;
+            byte[] buffer = new byte[2048];
+            while ((byteRead = bis.read(buffer)) != -1) {
+                bos.write(buffer, 0, byteRead);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert bos != null;
+                bos.flush();
+                bis.close();
+                fos.close();
+                bos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public static void setFileDownloadHeader(HttpServletRequest request,
+                                             HttpServletResponse response, String fileName) {
+        try {
+            String encodedFileName = null;
+            String agent = request.getHeader("USER-AGENT");
+            if (null != agent && agent.contains("MSIE")) {
+                encodedFileName = URLEncoder.encode(fileName, "UTF-8");
+            } else if (null != agent && agent.contains("Mozilla")) {
+                encodedFileName = new String(fileName.getBytes(StandardCharsets.UTF_8),
+                        StandardCharsets.ISO_8859_1);
+            } else {
+                encodedFileName = URLEncoder.encode(fileName, "UTF-8");
+            }
+
+            response.setContentType("application/x-download;charset=UTF-8");
+            response.setHeader("Content-Disposition", "attachment;filename=\""
+                    + encodedFileName + "\"");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
 }

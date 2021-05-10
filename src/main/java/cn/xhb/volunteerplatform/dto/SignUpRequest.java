@@ -1,6 +1,5 @@
 package cn.xhb.volunteerplatform.dto;
 
-import cn.xhb.volunteerplatform.entity.CommunityOrganization;
 import lombok.Data;
 
 @Data
@@ -17,6 +16,13 @@ public class SignUpRequest {
     private String city;
     private String area;
     private String joinCommunityInfo;
-    private CommunityOrganization community;
+
+    private String communityName;
+    private String communityProvince;
+    private String communityCity;
+    private String communityArea;
+    private String communityDetailAddress;
+
+
 
 }

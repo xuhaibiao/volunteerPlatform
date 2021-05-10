@@ -14,7 +14,7 @@ public class CommunityOrganization {
 
     private String detailAddress;
 
-    private String undertaker;
+    private Integer workerId;
 
     private String province;
 
@@ -27,6 +27,12 @@ public class CommunityOrganization {
     private Integer hasDeleted;
 
     private Date deleteTime;
+
+    private Integer hasApproved;
+
+    private String fileinfo;
+
+    private String undertaker;
 
 
 }

@@ -14,10 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -61,26 +59,8 @@ public class CommonController {
         }
     }
 
-    @GetMapping("/testInsert")
-    public Integer test(){
-        Worker worker = new Worker();
-        worker.setIdCard("test");
-        worker.setName("test");
-        worker.setPassword("test");
-        worker.setPhone("test");
-        worker.setAddress("test");
-        worker.setGender(0);
-        worker.setCreateTime(new Date());
-        worker.setBanStatus(0);
-        // 需要等待社区发起人通过才能设置
-        worker.setCommunityId(-1);
-        // 返回主键id
-        int i = userService.addWorker(worker);
-        return worker.getId();
-    }
-
     @PostMapping("/signUp")
-    public Result<SignUpResponse> signUp(@RequestBody SignUpRequest signUpRequest) {
+    public Result<String> signUp(SignUpRequest signUpRequest, MultipartFile file, HttpServletRequest req) {
 
         try {
             if (signUpRequest.getType() == 0) {
@@ -152,20 +132,33 @@ public class CommonController {
                 worker.setCommunityId(-1);
                 int i = userService.addWorker(worker);
                 if (i > 0) {
-                    //获取社区信息
-                    CommunityOrganization community = signUpRequest.getCommunity();
-                    community.setUndertaker(signUpRequest.getUsername());
-                    community.setCreateTime(new Date());
-                    community.setHasDeleted(0);
-                    int k = communityService.add(community);
-                    if (k > 0) {
-                        SignUpResponse signUpResponse = new SignUpResponse();
-                        signUpResponse.setCommunityId(community.getId());
-                        signUpResponse.setWorkerId(worker.getId());
-                        return Result.success(signUpResponse);
+                    Result<String> upload = this.upload(file, req);
+                    // 如果上传材料成功
+                    if (upload.getCode() == 1) {
+                        //获取社区信息
+                        CommunityOrganization community = new CommunityOrganization();
+                        community.setProvince(signUpRequest.getCommunityProvince());
+                        community.setCity(signUpRequest.getCommunityCity());
+                        community.setArea(signUpRequest.getCommunityArea());
+                        community.setDetailAddress(signUpRequest.getCommunityDetailAddress());
+                        community.setName(signUpRequest.getCommunityName());
+                        community.setUndertaker(signUpRequest.getUsername());
+                        community.setCreateTime(new Date());
+                        community.setHasDeleted(0);
+                        community.setWorkerId(worker.getId());
+                        community.setFileinfo(upload.getData());
+                        // 需要等待管理员审核
+                        community.setHasApproved(0);
+                        int k = communityService.add(community);
+                        if (k > 0) {
+                            return Result.success(null);
+                        } else {
+                            return Result.error("注册失败！");
+                        }
                     } else {
-                        return Result.error("注册失败！");
+                        return upload;
                     }
+
                 } else {
                     return Result.error("注册失败！");
                 }
@@ -250,7 +243,6 @@ public class CommonController {
     }
 
 
-    @PostMapping("/upload")
     public Result<String> upload(MultipartFile file, HttpServletRequest req) {
         if (file == null) {
             return Result.error("上传文件为空");
@@ -281,9 +273,10 @@ public class CommonController {
         try {
             file.transferTo(new File(folder,newName));
             //这个还有一个url
-            String url = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + "/" + realPath + newName;
+//            String url = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + "/" + realPath + newName;
             //如果指向成功了
-            rs = Result.success(url);
+//            rs = Result.success(url);
+            rs = Result.success(newName + ";" + format);
         } catch (IOException e) {
             //返回异常
             rs = Result.error(e.getMessage());
@@ -292,66 +285,5 @@ public class CommonController {
         return  rs;
 
     }
-
-
-    @GetMapping("/download")
-    public void download(@RequestParam("fileName") String fileName, @RequestParam("fileDate") String fileDate,HttpServletRequest req, HttpServletResponse resp) {
-
-        BufferedInputStream bis = null;
-        BufferedOutputStream bos = null;
-        OutputStream fos = null;
-        try {
-            String filePath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\fileData";
-            bis = new BufferedInputStream(new FileInputStream(filePath + "/" + fileDate + "/" + fileName));
-            fos = resp.getOutputStream();
-            bos = new BufferedOutputStream(fos);
-            setFileDownloadHeader(req, resp, fileName);
-            resp.setContentType("application/octet-stream");
-            resp.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8), "iso-8859-1"));
-            int byteRead = 0;
-            byte[] buffer = new byte[2048];
-            while ((byteRead = bis.read(buffer)) != -1) {
-                bos.write(buffer, 0, byteRead);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                assert bos != null;
-                bos.flush();
-                bis.close();
-                fos.close();
-                bos.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
-    public static void setFileDownloadHeader(HttpServletRequest request,
-                                             HttpServletResponse response, String fileName) {
-        try {
-            String encodedFileName = null;
-            String agent = request.getHeader("USER-AGENT");
-            if (null != agent && agent.contains("MSIE")) {
-                encodedFileName = URLEncoder.encode(fileName, "UTF-8");
-            } else if (null != agent && agent.contains("Mozilla")) {
-                encodedFileName = new String(fileName.getBytes(StandardCharsets.UTF_8),
-                        StandardCharsets.ISO_8859_1);
-            } else {
-                encodedFileName = URLEncoder.encode(fileName, "UTF-8");
-            }
-
-            response.setContentType("application/x-download;charset=UTF-8");
-            response.setHeader("Content-Disposition", "attachment;filename=\""
-                    + encodedFileName + "\"");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
 
 }

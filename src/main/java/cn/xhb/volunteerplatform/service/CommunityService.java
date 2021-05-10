@@ -1,10 +1,7 @@
 package cn.xhb.volunteerplatform.service;
 
 import cn.xhb.volunteerplatform.constant.MessageConstant;
-import cn.xhb.volunteerplatform.dto.CommunitySearchQuery;
-import cn.xhb.volunteerplatform.dto.JoinListResponse;
-import cn.xhb.volunteerplatform.dto.JoinRequest;
-import cn.xhb.volunteerplatform.dto.LoadAllCommunityResponse;
+import cn.xhb.volunteerplatform.dto.*;
 import cn.xhb.volunteerplatform.dto.vo.VolunteerListVo;
 import cn.xhb.volunteerplatform.dto.vo.WorkerListVo;
 import cn.xhb.volunteerplatform.entity.CommunityOrganization;
@@ -248,5 +245,44 @@ public class CommunityService {
 
     public int add(CommunityOrganization community) {
         return communityOrganizationMapper.insertSelective(community);
+    }
+
+    public List<ReviewCommunitiesResponse> getAllNeedReviewCommunities() {
+        List<CommunityOrganization> communities = communityOrganizationMapper.selectNotApproved();
+        List<ReviewCommunitiesResponse> rs = new ArrayList<>(communities.size());
+        for (CommunityOrganization community : communities) {
+            ReviewCommunitiesResponse tmp = new ReviewCommunitiesResponse();
+            tmp.setCommunity(community);
+            String fileinfo = community.getFileinfo();
+            String[] fileInfos = fileinfo.split(";");
+            tmp.setFileName(fileInfos[0]);
+            tmp.setFileDate(fileInfos[1]);
+            rs.add(tmp);
+        }
+        return rs;
+    }
+
+    public int approved(CommunityOrganization community) {
+        community.setUpdateTime(new Date());
+        community.setHasApproved(1);
+        int i = communityOrganizationMapper.updateByPrimaryKeySelective(community);
+        if (i > 0) {
+            Worker worker = new Worker();
+            worker.setId(community.getWorkerId());
+            worker.setCommunityId(community.getId());
+            return workerMapper.updateByPrimaryKeySelective(worker);
+        } else {
+            return 0;
+        }
+
+    }
+
+    public int refuseApproved(CommunityOrganization community) {
+        int i = communityOrganizationMapper.deleteByPrimaryKey(community.getId());
+        if (i > 0) {
+            return workerMapper.deleteByPrimaryKey(community.getWorkerId());
+        } else {
+            return 0;
+        }
     }
 }
