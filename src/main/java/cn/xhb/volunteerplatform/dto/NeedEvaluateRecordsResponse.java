@@ -12,7 +12,15 @@ public class NeedEvaluateRecordsResponse {
 
     private String volunteerName;
 
+    private String volunteerIdCard;
+
     private Float evaluateScore;
+
+    private String picUrl;
+
+    private Float volunteerEvaluateScore;
+
+    private String volunteerEvaluatContent;
 
     /**
      * 作为评价后状态转变的依据（重要）

@@ -6,10 +6,13 @@ import cn.xhb.volunteerplatform.dto.*;
 import cn.xhb.volunteerplatform.entity.CommunityOrganization;
 import cn.xhb.volunteerplatform.entity.Volunteer;
 import cn.xhb.volunteerplatform.service.*;
+import cn.xhb.volunteerplatform.util.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -32,8 +35,15 @@ public class VolunteerController {
     public Result<List<ActivityResponse>> getActivities(){
         List<ActivityResponse> rs = activityService.getNotDeletedActivities();
         return Result.success(rs);
-
     }
+
+    @GetMapping("/activityInfo")
+    public Result<ActivityResponse> getActivityInfo(@RequestParam("activityId") Integer activityId){
+        ActivityResponse rs = activityService.getActivityInfoById(activityId);
+        return Result.success(rs);
+    }
+
+
 
     @GetMapping("/activity/search")
     public Result<List<ActivityResponse>> getActivitiesBySearch(@RequestParam("province") String province,@RequestParam("city") String city,@RequestParam("area") String area,@RequestParam("activityName") String activityName){
@@ -90,13 +100,19 @@ public class VolunteerController {
     }
 
     @PostMapping("/record/evaluate")
-    public Result<Object> evaluate(@RequestBody VolunteerEvaluateRequest evaluateRequest){
-        int i = evaluateService.volunteerEvaluate(evaluateRequest.getScore(), evaluateRequest.getContent(), evaluateRequest.getRecordId(), evaluateRequest.getRecordStatus());
-        if (i > 0) {
-            return Result.success(null);
+    public Result<String> evaluate(VolunteerEvaluateRequest evaluateRequest, MultipartFile file, HttpServletRequest req){
+        Result<String> upload = FileUtils.uploadPic(file, req);
+        if (upload.getCode() == 1) {
+            int i = evaluateService.volunteerEvaluate(evaluateRequest.getScore(), evaluateRequest.getContent(), evaluateRequest.getRecordId(), evaluateRequest.getRecordStatus(), upload.getData());
+            if (i > 0) {
+                return Result.success(null);
+            } else {
+                return Result.error("评价失败！");
+            }
         } else {
-            return Result.error();
+            return upload;
         }
+
     }
 
     @PostMapping("/record/cancelSignUp")
@@ -193,6 +209,7 @@ public class VolunteerController {
         MessageResponse rs = messageService.getVolunteerMessages(v);
         return Result.success(rs);
     }
+
 
 
 }

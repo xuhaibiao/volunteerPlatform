@@ -26,5 +26,7 @@ public class VolunteerRecord {
 
     private Date updateTime;
 
+    private String picInfo;
+
 
 }

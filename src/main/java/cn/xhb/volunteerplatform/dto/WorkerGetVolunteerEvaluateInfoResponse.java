@@ -9,4 +9,6 @@ public class WorkerGetVolunteerEvaluateInfoResponse {
     private Integer gender;
     private Float volunteerEvaluateScore;
     private String volunteerEvaluateContent;
+    private String picInfo;
+    private String picUrl;
 }

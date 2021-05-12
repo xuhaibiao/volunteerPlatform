@@ -12,6 +12,7 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
     <result column="delete_time" property="deleteTime" jdbcType="TIMESTAMP" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+    <result column="picInfo" property="picInfo" jdbcType="VARCHAR" />
   </resultMap>
 
   <resultMap id="volunteers" type="cn.xhb.volunteerplatform.entity.Volunteer" >
@@ -24,7 +25,7 @@
 
   <sql id="Base_Column_List" >
     id, volunteer_id, activity_id, status, volunteer_evaluate_content, worker_evaluate, create_time,
-    delete_time,volunteer_evaluate_score,update_time
+    delete_time,volunteer_evaluate_score,update_time ,picInfo
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -77,7 +78,7 @@
   </select>
 
   <select id="selectVolunteerEvaluateInfoByActivityId" resultMap="volunteerEvaluateInfo">
-    select b.id,b.name,b.gender,a.volunteer_evaluate_score,a.volunteer_evaluate_content
+    select b.id,b.name,b.gender,a.volunteer_evaluate_score,a.volunteer_evaluate_content,a.picInfo
     from volunteer_record as a, volunteer as b
     where a.volunteer_id = b.id and a.activity_id = #{activityId,jdbcType=INTEGER} and status > 3;
 
@@ -97,10 +98,10 @@
   <insert id="insert" parameterType="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
     insert into volunteer_record (id, volunteer_id, activity_id, 
       status, volunteer_evaluate_content, worker_evaluate,
-      create_time, delete_time,volunteer_evaluate_score,update_time)
+      create_time, delete_time,volunteer_evaluate_score,update_time,picInfo)
     values (#{id,jdbcType=INTEGER}, #{volunteerId,jdbcType=INTEGER}, #{activityId,jdbcType=INTEGER}, 
       #{status,jdbcType=INTEGER}, #{volunteerEvaluateContent,jdbcType=VARCHAR}, #{workerEvaluate,jdbcType=REAL},
-      #{createTime,jdbcType=TIMESTAMP}, #{deleteTime,jdbcType=TIMESTAMP},#{volunteerEvaluateScore,jdbcType=REAL},#{updateTime,jdbcType=TIMESTAMP})
+      #{createTime,jdbcType=TIMESTAMP}, #{deleteTime,jdbcType=TIMESTAMP},#{volunteerEvaluateScore,jdbcType=REAL},#{updateTime,jdbcType=TIMESTAMP}, #{picInfo,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="cn.xhb.volunteerplatform.entity.VolunteerRecord" >
     insert into volunteer_record
@@ -135,6 +136,9 @@
       <if test="updateTime != null" >
         update_time,
       </if>
+      <if test="picInfo != null" >
+        picInfo,
+      </if>
 
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -167,6 +171,9 @@
       </if>
       <if test="updateTime != null" >
         #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="picInfo != null" >
+        #{picInfo,jdbcType=VARCHAR},
       </if>
 
     </trim>
@@ -201,6 +208,9 @@
       <if test="updateTime != null" >
         update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
+      <if test="picInfo != null" >
+        picInfo = #{picInfo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -214,6 +224,8 @@
       create_time = #{createTime,jdbcType=TIMESTAMP},
       delete_time = #{deleteTime,jdbcType=TIMESTAMP},
       volunteer_evaluate_score = #{volunteerEvaluateScore,jdbcType=REAL},update_time = #{updateTime,jdbcType=TIMESTAMP},
-    where id = #{id,jdbcType=INTEGER}
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      picInfo = #{picInfo,jdbcType=VARCHAR},
+    where id = #{id,jdbcType=INTEGER},
   </update>
 </mapper>

@@ -12,7 +12,11 @@ public class WorkerEvaluateRecordsRequest {
 
     private String volunteerName;
 
+    private String volunteerIdCard;
+
     private Float evaluateScore;
+
+    private String picUrl;
 
     /**
      * 评价前的记录状态

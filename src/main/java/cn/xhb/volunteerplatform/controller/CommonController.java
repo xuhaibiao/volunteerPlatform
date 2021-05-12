@@ -132,7 +132,7 @@ public class CommonController {
                 worker.setCommunityId(-1);
                 int i = userService.addWorker(worker);
                 if (i > 0) {
-                    Result<String> upload = this.upload(file, req);
+                    Result<String> upload = this.uploadCommunityFile(file, req);
                     // 如果上传材料成功
                     if (upload.getCode() == 1) {
                         //获取社区信息
@@ -243,7 +243,7 @@ public class CommonController {
     }
 
 
-    public Result<String> upload(MultipartFile file, HttpServletRequest req) {
+    public Result<String> uploadCommunityFile(MultipartFile file, HttpServletRequest req) {
         if (file == null) {
             return Result.error("上传文件为空");
         }
@@ -252,7 +252,7 @@ public class CommonController {
         //再用pdf格式开始书写,先找原始的名字
         String originName = file.getOriginalFilename();
 //        判断文件类型是不是pdf
-        if(!originName.endsWith(".pdf")){
+        if(!(originName.endsWith(".pdf")||originName.endsWith(".PDF"))){
             //如果不是的话，就返回类型
             return Result.error("文件类型不对");
 

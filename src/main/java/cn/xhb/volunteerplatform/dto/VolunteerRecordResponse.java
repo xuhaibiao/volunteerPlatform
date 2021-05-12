@@ -11,5 +11,7 @@ public class VolunteerRecordResponse {
      * 活动
      */
     private ActivityResponse activityResponse;
+
+    private String recordCreateTime;
     
 }

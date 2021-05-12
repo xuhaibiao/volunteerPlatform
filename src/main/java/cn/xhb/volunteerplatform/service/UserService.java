@@ -5,6 +5,7 @@ import cn.xhb.volunteerplatform.constant.RecordConstant;
 import cn.xhb.volunteerplatform.dto.*;
 import cn.xhb.volunteerplatform.entity.*;
 import cn.xhb.volunteerplatform.mapper.*;
+import cn.xhb.volunteerplatform.util.DateUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -75,8 +76,13 @@ public class UserService {
     public List<VolunteerRecordResponse> getVolunteerRecordsByVolunteerId(Integer volunteerId){
         List<VolunteerRecord> volunteerRecords = volunteerRecordMapper.selectByVolunteerId(volunteerId);
         List<VolunteerRecordResponse> rs = new ArrayList<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (VolunteerRecord volunteerRecord : volunteerRecords) {
             VolunteerRecordResponse volunteerRecordResponse = new VolunteerRecordResponse();
+
+            String recordCreateTime = sdf.format(volunteerRecord.getCreateTime());
+            volunteerRecordResponse.setRecordCreateTime(recordCreateTime);
+
             volunteerRecordResponse.setVolunteerRecord(volunteerRecord);
             Integer activityId = volunteerRecord.getActivityId();
             Activity activity = activityMapper.selectByPrimaryKey(activityId);
@@ -93,10 +99,14 @@ public class UserService {
             volunteerRecordMapper.updateByPrimaryKeySelective(volunteerRecord);
             ActivityResponse activityResponse = new ActivityResponse();
             activityResponse.setActivity(activity);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String begin = sdf.format(activity.getActivityBeginTime());
-            String end = sdf.format(activity.getActivityEndTime());
-            activityResponse.setActivityTimeRange(begin + "至" + end);
+
+            String abegin = sdf.format(activity.getActivityBeginTime());
+            String aend = sdf.format(activity.getActivityEndTime());
+            String rbegin = sdf.format(activity.getRecruitBeginTime());
+            String rend = sdf.format(activity.getRecruitEndTime());
+            activityResponse.setActivityTimeRange(abegin + " 至 " + aend);
+            activityResponse.setRecruitTimeRange(rbegin + " 至 " + rend);
+
             Worker worker = workerMapper.selectByPrimaryKey(activity.getWorkerId());
             CommunityOrganization communityOrganization = communityOrganizationMapper.selectByPrimaryKey(worker.getCommunityId());
             activityResponse.setCommunityName(communityOrganization.getName());
@@ -132,16 +142,23 @@ public class UserService {
         List<Activity> activities = activityMapper.selectNotDeletedByWorkerId(workerId);
         List<NeedEvaluateRecordsResponse> rs = new ArrayList<>();
         for (Activity activity : activities) {
-            List<VolunteerRecord> volunteerRecords = volunteerRecordMapper.selectByActivityIdAndTwoStatus(activity.getId(), RecordConstant.ACTIVITY_IS_OVER, RecordConstant.VOLUNTEER_HAS_EVALUATE_WORKER_NOT);
+            List<VolunteerRecord> volunteerRecords = volunteerRecordMapper.selectByActivityIdAndStatus(activity.getId(), RecordConstant.VOLUNTEER_HAS_EVALUATE_WORKER_NOT);
             for (VolunteerRecord volunteerRecord : volunteerRecords) {
                 NeedEvaluateRecordsResponse tmp = new NeedEvaluateRecordsResponse();
                 tmp.setRecordId(volunteerRecord.getId());
                 tmp.setRecordStatus(volunteerRecord.getStatus());
                 tmp.setActivityId(volunteerRecord.getActivityId());
                 tmp.setActivityName(activity.getName());
+                tmp.setVolunteerEvaluatContent(volunteerRecord.getVolunteerEvaluateContent());
+                tmp.setVolunteerEvaluateScore(volunteerRecord.getVolunteerEvaluateScore());
+                String[] picInfos = volunteerRecord.getPicInfo().split(";");
+                String picName = picInfos[0];
+                String picDate = picInfos[1];
+                tmp.setPicUrl("http://localhost:9000/show/" + picDate + "/" + picName);
                 Integer volunteerId = volunteerRecord.getVolunteerId();
                 Volunteer volunteer = volunteerMapper.selectByPrimaryKey(volunteerId);
                 tmp.setVolunteerName(volunteer.getName());
+                tmp.setVolunteerIdCard(volunteer.getIdCard());
                 rs.add(tmp);
             }
         }
@@ -223,6 +240,12 @@ public class UserService {
      */
     public List<WorkerGetVolunteerEvaluateInfoResponse> getVolunteerEvaluateInfoByActivityId(Integer activityId) {
         List<WorkerGetVolunteerEvaluateInfoResponse> infos = volunteerRecordMapper.selectVolunteerEvaluateInfoByActivityId(activityId);
+        for (WorkerGetVolunteerEvaluateInfoResponse info : infos) {
+            String[] picInfos = info.getPicInfo().split(";");
+            String picName = picInfos[0];
+            String picDate = picInfos[1];
+            info.setPicUrl("http://localhost:9000/show/" + picDate + "/" + picName);
+        }
         return infos;
     }
 
@@ -237,12 +260,28 @@ public class UserService {
 
     }
 
-    public List<Volunteer> getAllVolunteer() {
-        return volunteerMapper.selectAll();
+    public List<VolunteerAuthorityResponse> getAllVolunteer() {
+        List<Volunteer> volunteers = volunteerMapper.selectAll();
+        List<VolunteerAuthorityResponse> rs = new ArrayList<>(volunteers.size());
+        for (Volunteer volunteer : volunteers) {
+            VolunteerAuthorityResponse tmp = new VolunteerAuthorityResponse();
+            tmp.setVolunteer(volunteer);
+            tmp.setCreateTime(DateUtils.dateToStr(volunteer.getCreateTime()));
+            rs.add(tmp);
+        }
+        return rs;
     }
 
-    public List<Worker> getAllWorker() {
-        return workerMapper.selectAll();
+    public List<WorkerAuthorityResponse> getAllWorker() {
+        List<Worker> workers = workerMapper.selectAll();
+        List<WorkerAuthorityResponse> rs = new ArrayList<>(workers.size());
+        for (Worker worker : workers) {
+            WorkerAuthorityResponse tmp = new WorkerAuthorityResponse();
+            tmp.setWorker(worker);
+            tmp.setCreateTime(DateUtils.dateToStr(worker.getCreateTime()));
+            rs.add(tmp);
+        }
+        return rs;
     }
 
 

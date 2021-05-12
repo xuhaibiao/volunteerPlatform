@@ -7,10 +7,13 @@ import cn.xhb.volunteerplatform.entity.Message;
 import cn.xhb.volunteerplatform.entity.Volunteer;
 import cn.xhb.volunteerplatform.entity.Worker;
 import cn.xhb.volunteerplatform.service.*;
+import cn.xhb.volunteerplatform.util.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -81,24 +84,51 @@ public class WorkerController {
     }
 
     @PostMapping("/activity/add")
-    public Result<Object> addActivity(@RequestBody AddActivityRquest addActivityRquest){
-        int i = activityService.addActivity(addActivityRquest);
-        if (i > 0) {
-            return Result.success(null);
+    public Result<String> addActivity(AddActivityRquest addActivityRquest, MultipartFile file, HttpServletRequest req){
+        Result<String> upload = FileUtils.uploadPic(file, req);
+        if (upload.getCode() == 1) {
+            int i = activityService.addActivity(addActivityRquest, upload.getData());
+            if (i > 0) {
+                return Result.success(null);
+            } else {
+                return Result.error("发布失败");
+            }
         } else {
-            return Result.error();
+            return upload;
         }
+
+
     }
 
-    @PutMapping("/activity/edit")
-    public Result<Object> editActivity(@RequestBody EditActivityRquest editActivityRquest){
-        int i = activityService.editActivity(editActivityRquest);
-        if (i > 0) {
-            return Result.success(null);
+    @PostMapping("/activity/editWithPic")
+    public Result<String> editActivity(EditActivityRquest editActivityRquest, MultipartFile file, HttpServletRequest req) {
+
+        Result<String> editUpload = FileUtils.uploadPic(file, req);
+        if (editUpload.getCode() == 1) {
+            int i = activityService.editActivity(editActivityRquest, editUpload.getData());
+            if (i > 0) {
+                return Result.success(null);
+            } else {
+                return Result.error("修改失败！");
+            }
         } else {
-            return Result.error();
+            return editUpload;
         }
+
     }
+
+        @PostMapping("/activity/editWithoutPic")
+        public Result<String> editActivity(@RequestBody EditActivityRquest editActivityRquest){
+            int i = activityService.editActivity(editActivityRquest, null);
+            if (i > 0) {
+                return Result.success(null);
+            } else {
+                return Result.error("修改失败！");
+            }
+
+
+
+        }
 
     @PostMapping("/activity/agreeJoin")
     public Result<Object> agreeJoinActivity(@RequestBody ExamineActivityRequest examineActivityRequest){
@@ -129,6 +159,16 @@ public class WorkerController {
     @PostMapping("/needEvaluateRecords/evaluate")
     public Result<Object> evaluate(@RequestBody WorkerEvaluateRecordsRequest workerEvaluateRecordsRequest){
         int i = evaluateService.workerEvaluate(workerEvaluateRecordsRequest.getEvaluateScore(), workerEvaluateRecordsRequest.getRecordId(), workerEvaluateRecordsRequest.getRecordStatus());
+        if (i > 0) {
+            return Result.success(null);
+        } else {
+            return Result.error();
+        }
+    }
+
+    @PostMapping("/needEvaluateRecords/refuse")
+    public Result<Object> refuseEvaluate(@RequestBody WorkerEvaluateRecordsRequest workerEvaluateRecordsRequest){
+        int i = evaluateService.workerRefuseEvaluate(workerEvaluateRecordsRequest.getRecordId());
         if (i > 0) {
             return Result.success(null);
         } else {

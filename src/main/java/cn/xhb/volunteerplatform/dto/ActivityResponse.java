@@ -11,12 +11,20 @@ public class ActivityResponse {
      * 活动时间范围
      */
     private String activityTimeRange;
+    /**
+     * 招募时间范围
+     */
+    private String recruitTimeRange;
 
     /**
      * 发起人
      */
     private String sponsor;
 
+    /**
+     * 联系方式
+     */
+    private String sponsorPhoneNumber;
     /**
      * 发起社区名
      */
@@ -46,6 +54,8 @@ public class ActivityResponse {
      * 活动状态
      */
     private String activityStatus;
+
+    private String picUrl;
 
 
 }

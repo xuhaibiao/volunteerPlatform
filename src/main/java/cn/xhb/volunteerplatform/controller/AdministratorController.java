@@ -1,10 +1,7 @@
 package cn.xhb.volunteerplatform.controller;
 
 
-import cn.xhb.volunteerplatform.dto.AdministratorAddMsgRequest;
-import cn.xhb.volunteerplatform.dto.ChangeActivityBanStatusRequest;
-import cn.xhb.volunteerplatform.dto.Result;
-import cn.xhb.volunteerplatform.dto.ReviewCommunitiesResponse;
+import cn.xhb.volunteerplatform.dto.*;
 import cn.xhb.volunteerplatform.entity.*;
 import cn.xhb.volunteerplatform.service.ActivityService;
 import cn.xhb.volunteerplatform.service.CommunityService;
@@ -38,20 +35,20 @@ public class AdministratorController {
     CommunityService communityService;
 
     @GetMapping("/volunteerAuthority")
-    public Result<List<Volunteer>> getAllVolunteer() {
-        List<Volunteer> rs = userService.getAllVolunteer();
+    public Result<List<VolunteerAuthorityResponse>> getAllVolunteer() {
+        List<VolunteerAuthorityResponse> rs = userService.getAllVolunteer();
         return Result.success(rs);
     }
 
     @GetMapping("/workerAuthority")  
-    public Result<List<Worker>> getAllWorker() {
-        List<Worker> rs = userService.getAllWorker();
+    public Result<List<WorkerAuthorityResponse>> getAllWorker() {
+        List<WorkerAuthorityResponse> rs = userService.getAllWorker();
         return Result.success(rs);
     }
 
     @GetMapping("/activityAuthority")
-    public Result<List<Activity>> getAllActivity() {
-        List<Activity> rs = activityService.getAllActivity();
+    public Result<List<ActivityAuthorityResponse>> getAllActivity() {
+        List<ActivityAuthorityResponse> rs = activityService.getAllActivity();
         return Result.success(rs);
     }
 

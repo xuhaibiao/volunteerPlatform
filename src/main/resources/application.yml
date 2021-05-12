@@ -3,7 +3,7 @@ spring:
   datasource:
     #MySQL配置
     driverClassName:  com.mysql.jdbc.Driver
-    url: jdbc:mysql://47.100.23.55:3306/volunteerPlatform?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://47.100.23.55:3306/volunteerPlatform?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: xhb123
     type: com.alibaba.druid.pool.DruidDataSource
@@ -33,3 +33,8 @@ mybatis:
 
 server:
   port: 9000
+
+path:
+  show: /show/**
+  picPath: C:/Users/Lucas/IdeaProjects/volunteerPlatform/picData/
+

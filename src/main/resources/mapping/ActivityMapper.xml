@@ -21,6 +21,7 @@
     <result column="has_deleted" property="hasDeleted" jdbcType="INTEGER" />
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
     <result column="ban_status" property="banStatus" jdbcType="TIMESTAMP" />
+    <result column="picInfo" property="picInfo" jdbcType="VARCHAR" />
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="cn.xhb.volunteerplatform.entity.Activity" extends="BaseResultMap" >
     <result column="content" property="content" jdbcType="LONGVARCHAR" />
@@ -28,7 +29,7 @@
   <sql id="Base_Column_List" >
     id, province, city, area, name, recruit_begin_time, recruit_end_time, activity_begin_time, activity_end_time,
     recruit_number, working_hours, detail_address, recruit_range, worker_id, create_time, 
-    delete_time, has_deleted, update_time, ban_status
+    delete_time, has_deleted, update_time, ban_status, picInfo
   </sql>
   <sql id="Blob_Column_List" >
     content
@@ -112,13 +113,13 @@
       activity_end_time, recruit_number, working_hours, 
       detail_address, recruit_range, worker_id, 
       create_time, delete_time, has_deleted, 
-      update_time, content,ban_status)
+      update_time, content, ban_status, picInfo)
     values (#{id,jdbcType=INTEGER}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, #{area,jdbcType=VARCHAR},#{name,jdbcType=VARCHAR},
       #{recruitBeginTime,jdbcType=TIMESTAMP}, #{recruitEndTime,jdbcType=TIMESTAMP}, #{activityBeginTime,jdbcType=TIMESTAMP}, 
       #{activityEndTime,jdbcType=TIMESTAMP}, #{recruitNumber,jdbcType=INTEGER}, #{workingHours,jdbcType=REAL}, 
       #{detailAddress,jdbcType=VARCHAR}, #{recruitRange,jdbcType=INTEGER}, #{workerId,jdbcType=INTEGER}, 
       #{createTime,jdbcType=TIMESTAMP}, #{deleteTime,jdbcType=TIMESTAMP}, #{hasDeleted,jdbcType=INTEGER}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR},#{banStatus,jdbcType=INTEGER})
+      #{updateTime,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR},#{banStatus,jdbcType=INTEGER}, #{picInfo,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="cn.xhb.volunteerplatform.entity.Activity" >
     insert into activity
@@ -183,6 +184,9 @@
       <if test="banStatus != null">
         ban_status,
       </if>
+      <if test="picInfo != null" >
+        picInfo,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -244,6 +248,9 @@
       </if>
       <if test="banStatus != null">
         #{banStatus,jdbcType=INTEGER},
+      </if>
+      <if test="picInfo != null" >
+        #{picInfo,jdbcType=VARCHAR},
       </if>
     </trim>
   </insert>
@@ -307,6 +314,9 @@
       <if test="banStatus != null">
         ban_status = #{banStatus,jdbcType=INTEGER},
       </if>
+      <if test="picInfo != null" >
+        picInfo = #{picInfo,jdbcType=VARCHAR},
+      </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
@@ -330,7 +340,8 @@
       has_deleted = #{hasDeleted,jdbcType=INTEGER},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
       content = #{content,jdbcType=LONGVARCHAR},
-      ban_status = #{banStatus,jdbcType=INTEGER}
+      ban_status = #{banStatus,jdbcType=INTEGER},
+      picInfo = #{picInfo,jdbcType=VARCHAR},
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.xhb.volunteerplatform.entity.Activity" >
@@ -352,7 +363,8 @@
       delete_time = #{deleteTime,jdbcType=TIMESTAMP},
       has_deleted = #{hasDeleted,jdbcType=INTEGER},
       update_time = #{updateTime,jdbcType=TIMESTAMP},
-      ban_status = #{banStatus,jdbcType=INTEGER}
+      ban_status = #{banStatus,jdbcType=INTEGER},
+      picInfo = #{picInfo,jdbcType=VARCHAR},
     where id = #{id,jdbcType=INTEGER}
   </update>
 </mapper>

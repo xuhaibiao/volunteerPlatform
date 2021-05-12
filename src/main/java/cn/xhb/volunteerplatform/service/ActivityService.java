@@ -11,12 +11,16 @@ import cn.xhb.volunteerplatform.mapper.ActivityMapper;
 import cn.xhb.volunteerplatform.mapper.CommunityOrganizationMapper;
 import cn.xhb.volunteerplatform.mapper.VolunteerRecordMapper;
 import cn.xhb.volunteerplatform.mapper.WorkerMapper;
+import cn.xhb.volunteerplatform.util.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -33,19 +37,24 @@ public class ActivityService {
 
     public List<ActivityResponse> activityToActivityResponse(List<Activity> activities) {
         List<ActivityResponse> rsList = new ArrayList<>(activities.size());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Activity activity : activities) {
             ActivityResponse activityResponse = new ActivityResponse();
             activityResponse.setActivity(activity);
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String begin = sdf.format(activity.getActivityBeginTime());
-            String end = sdf.format(activity.getActivityEndTime());
-            activityResponse.setActivityTimeRange(begin + "至" + end);
+
+            String abegin = sdf.format(activity.getActivityBeginTime());
+            String aend = sdf.format(activity.getActivityEndTime());
+            String rbegin = sdf.format(activity.getRecruitBeginTime());
+            String rend = sdf.format(activity.getRecruitEndTime());
+            activityResponse.setActivityTimeRange(abegin + " 至 " + aend);
+            activityResponse.setRecruitTimeRange(rbegin + " 至 " + rend);
+
             Worker worker = workerMapper.selectByPrimaryKey(activity.getWorkerId());
             CommunityOrganization communityOrganization = communityOrganizationMapper.selectByPrimaryKey(worker.getCommunityId());
             activityResponse.setCommunityName(communityOrganization.getName());
             activityResponse.setCommunityId(communityOrganization.getId());
             activityResponse.setSponsor(worker.name);
+            activityResponse.setSponsorPhoneNumber(worker.getPhone());
             // 活动状态
             Date now = new Date();
             if(now.before(activity.getRecruitBeginTime())){
@@ -70,6 +79,10 @@ public class ActivityService {
                 agreeNum = volunteerRecordMapper.countByActivityIdAndStatus(activity.getId(), RecordConstant.REGISTRATION_PASSED);
             }
             activityResponse.setHasAgreeNumber(agreeNum);
+            String[] picInfos = activity.getPicInfo().split(";");
+            String picName = picInfos[0];
+            String picDate = picInfos[1];
+            activityResponse.setPicUrl("http://localhost:9000/show/" + picDate + "/" + picName);
             rsList.add(activityResponse);
         }
         return rsList;
@@ -127,49 +140,138 @@ public class ActivityService {
         return activityMapper.updateByPrimaryKeySelective(activity);
     }
 
-    public int addActivity(AddActivityRquest addActivityRquest) {
-        Activity activity = new Activity();
-        BeanUtils.copyProperties(addActivityRquest, activity);
-        activity.setHasDeleted(0);
-        activity.setActivityBeginTime(addActivityRquest.getActivityDateRange()[0]);
-        activity.setActivityEndTime(addActivityRquest.getActivityDateRange()[1]);
-        activity.setRecruitBeginTime(addActivityRquest.getRecruitDateRange()[0]);
-        activity.setRecruitEndTime(addActivityRquest.getRecruitDateRange()[1]);
-        activity.setCreateTime(new Date());
-        activity.setWorkerId(addActivityRquest.getWorker().getId());
-        activity.setBanStatus(0);
-        if ("本社区".equals(addActivityRquest.getRecruitRange())) {
-            activity.setRecruitRange(0);
-        } else {
-            activity.setRecruitRange(1);
+    public int addActivity(AddActivityRquest addActivityRquest, String picInfo) {
+        try {
+            Activity activity = new Activity();
+            BeanUtils.copyProperties(addActivityRquest, activity);
+            activity.setHasDeleted(0);
+
+            String[] activityDateRange = addActivityRquest.getActivityDateRange();
+            String[] recruitDateRange = addActivityRquest.getRecruitDateRange();
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date ab = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[0]));
+            Date ae = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[1]));
+            Date rb = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[0]));
+            Date re = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[1]));
+            activity.setActivityBeginTime(ab);
+            activity.setActivityEndTime(ae);
+            activity.setRecruitBeginTime(rb);
+            activity.setRecruitEndTime(re);
+
+            activity.setCreateTime(new Date());
+            activity.setWorkerId(addActivityRquest.getWorkerId());
+            activity.setBanStatus(0);
+            activity.setPicInfo(picInfo);
+            if ("本社区".equals(addActivityRquest.getRecruitRange())) {
+                activity.setRecruitRange(0);
+            } else {
+                activity.setRecruitRange(1);
+            }
+            return activityMapper.insertSelective(activity);
+        } catch (ParseException e) {
+            return 0;
         }
-        return activityMapper.insertSelective(activity);
     }
 
-    public int editActivity(EditActivityRquest editActivityRquest) {
-        Activity activity = new Activity();
-        BeanUtils.copyProperties(editActivityRquest, activity);
-        activity.setHasDeleted(0);
-        activity.setActivityBeginTime(editActivityRquest.getActivityDateRange()[0]);
-        activity.setActivityEndTime(editActivityRquest.getActivityDateRange()[1]);
-        activity.setRecruitBeginTime(editActivityRquest.getRecruitDateRange()[0]);
-        activity.setRecruitEndTime(editActivityRquest.getRecruitDateRange()[1]);
-        activity.setWorkerId(editActivityRquest.getWorker().getId());
-        if ("本社区".equals(editActivityRquest.getRecruitRange())) {
-            activity.setRecruitRange(0);
-        } else {
-            activity.setRecruitRange(1);
+    public int editActivity(EditActivityRquest editActivityRquest, String picInfo) {
+        try {
+            Activity activity = new Activity();
+            BeanUtils.copyProperties(editActivityRquest, activity);
+            activity.setHasDeleted(0);
+
+            String[] activityDateRange = editActivityRquest.getActivityDateRange();
+            String[] recruitDateRange = editActivityRquest.getRecruitDateRange();
+//            System.out.println(activityDateRange[1]);
+            // 前后端同步时间，后端需要增加8小时
+            DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+            Date ab = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[0]));
+            Date ae = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[1]));
+            Date rb = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[0]));
+            Date re = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[1]));
+            activity.setActivityBeginTime(ab);
+            activity.setActivityEndTime(ae);
+            activity.setRecruitBeginTime(rb);
+            activity.setRecruitEndTime(re);
+            activity.setWorkerId(editActivityRquest.getWorkerId());
+            if (picInfo != null) {
+                activity.setPicInfo(picInfo);
+            }
+            if ("本社区".equals(editActivityRquest.getRecruitRange())) {
+                activity.setRecruitRange(0);
+            } else {
+                activity.setRecruitRange(1);
+            }
+            activity.setUpdateTime(new Date());
+            return activityMapper.updateByPrimaryKeySelective(activity);
+        } catch (ParseException e) {
+            return 0;
         }
-        activity.setUpdateTime(new Date());
-        return activityMapper.updateByPrimaryKeySelective(activity);
     }
 
 
-    public List<Activity> getAllActivity() {
-        return activityMapper.selectAll();
+    public List<ActivityAuthorityResponse> getAllActivity() {
+        List<Activity> activities = activityMapper.selectAll();
+        List<ActivityAuthorityResponse> rs = new ArrayList<>(activities.size());
+        for (Activity activity : activities) {
+            ActivityAuthorityResponse tmp = new ActivityAuthorityResponse();
+            tmp.setActivity(activity);
+            tmp.setCreateTime(DateUtils.dateToStr(activity.getCreateTime()));
+            rs.add(tmp);
+        }
+        return rs;
     }
 
     public int updateActivity(Activity activity) {
         return activityMapper.updateByPrimaryKeySelective(activity);
+    }
+
+    public ActivityResponse getActivityInfoById(Integer activityId) {
+        Activity activity = activityMapper.selectByPrimaryKey(activityId);
+        ActivityResponse activityResponse = new ActivityResponse();
+        activityResponse.setActivity(activity);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        String abegin = sdf.format(activity.getActivityBeginTime());
+        String aend = sdf.format(activity.getActivityEndTime());
+        String rbegin = sdf.format(activity.getRecruitBeginTime());
+        String rend = sdf.format(activity.getRecruitEndTime());
+        activityResponse.setActivityTimeRange(abegin + " 至 " + aend);
+        activityResponse.setRecruitTimeRange(rbegin + " 至 " + rend);
+
+        Worker worker = workerMapper.selectByPrimaryKey(activity.getWorkerId());
+        CommunityOrganization communityOrganization = communityOrganizationMapper.selectByPrimaryKey(worker.getCommunityId());
+        activityResponse.setCommunityName(communityOrganization.getName());
+        activityResponse.setCommunityId(communityOrganization.getId());
+        activityResponse.setSponsor(worker.name);
+        activityResponse.setSponsorPhoneNumber(worker.getPhone());
+        // 活动状态
+        Date now = new Date();
+        if(now.before(activity.getRecruitBeginTime())){
+            activityResponse.setActivityStatus(ActivityConstant.RECRUIT_NOT_STARTED);
+        } else if (now.before(activity.getRecruitEndTime())) {
+            activityResponse.setActivityStatus(ActivityConstant.RECRUITING);
+        } else if(now.before(activity.getActivityBeginTime())){
+            activityResponse.setActivityStatus(ActivityConstant.ACITVITY_NOT_STARTED);
+        } else if (now.before(activity.getActivityEndTime())) {
+            activityResponse.setActivityStatus(ActivityConstant.ACITVITY_DOING);
+        } else {
+            activityResponse.setActivityStatus(ActivityConstant.ACITVITY_OVER);
+        }
+        // 已报名的人数（不包括取消报名或者被拒绝的人数，即不包括记录状态为1的记录数)
+        int signedUpCount = volunteerRecordMapper.countByActivity(activity.getId());
+        activityResponse.setHasRecruitedNumber(signedUpCount);
+        // 获取该活动已经报名审核通过的人数
+        int agreeNum;
+        if (activityResponse.getActivityStatus() == ActivityConstant.RECRUIT_NOT_STARTED) {
+            agreeNum = 0;
+        }else{
+            agreeNum = volunteerRecordMapper.countByActivityIdAndStatus(activity.getId(), RecordConstant.REGISTRATION_PASSED);
+        }
+        activityResponse.setHasAgreeNumber(agreeNum);
+        String[] picInfos = activity.getPicInfo().split(";");
+        String picName = picInfos[0];
+        String picDate = picInfos[1];
+        activityResponse.setPicUrl("http://localhost:9000/show/" + picDate + "/" + picName);
+        return activityResponse;
     }
 }

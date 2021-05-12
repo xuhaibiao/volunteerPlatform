@@ -42,7 +42,10 @@ public class Activity {
 
     private String content;
 
+
     private Integer banStatus;
+
+    private String picInfo;
 
 
 }

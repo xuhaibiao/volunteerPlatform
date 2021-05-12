@@ -1,9 +1,6 @@
 package cn.xhb.volunteerplatform.dto;
 
-import cn.xhb.volunteerplatform.entity.Worker;
 import lombok.Data;
-
-import java.util.Date;
 
 @Data
 public class EditActivityRquest {
@@ -15,10 +12,14 @@ public class EditActivityRquest {
     private String detailAddress;
     private Float workingHours;
     private Integer recruitNumber;
-    private Date[] recruitDateRange;
-    private Date[] activityDateRange;
+    private String[] recruitDateRange;
+    private String[] activityDateRange;
+    //    private Date recruitBeginTime;
+//    private Date recruitEndTime;
+//    private Date activityBeginTime;
+//    private Date activityEndTime;
     private String recruitRange;
     private String content;
-    private Worker worker;
+    private Integer workerId;
 
 }
