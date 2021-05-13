@@ -36,6 +36,9 @@ public class ActivityService {
     CommunityOrganizationMapper communityOrganizationMapper;
 
     public List<ActivityResponse> activityToActivityResponse(List<Activity> activities) {
+        if (activities == null || activities.size() == 0) {
+            return new ArrayList<>();
+        }
         List<ActivityResponse> rsList = new ArrayList<>(activities.size());
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         for (Activity activity : activities) {
@@ -149,10 +152,10 @@ public class ActivityService {
             String[] activityDateRange = addActivityRquest.getActivityDateRange();
             String[] recruitDateRange = addActivityRquest.getRecruitDateRange();
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date ab = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[0]));
-            Date ae = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[1]));
-            Date rb = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[0]));
-            Date re = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[1]));
+            Date ab = DateUtils.dayAddAndSub(Calendar.HOUR, 0, df.parse(activityDateRange[0]));
+            Date ae = DateUtils.dayAddAndSub(Calendar.HOUR, 0, df.parse(activityDateRange[1]));
+            Date rb = DateUtils.dayAddAndSub(Calendar.HOUR, 0, df.parse(recruitDateRange[0]));
+            Date re = DateUtils.dayAddAndSub(Calendar.HOUR, 0, df.parse(recruitDateRange[1]));
             activity.setActivityBeginTime(ab);
             activity.setActivityEndTime(ae);
             activity.setRecruitBeginTime(rb);

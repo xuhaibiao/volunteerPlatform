@@ -30,7 +30,8 @@ public class FileUtils {
         }
 
         String format=sdf.format(new Date());
-        String realPath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\picData\\" + format;
+//        String realPath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\picData\\" + format;
+        String realPath = "E:\\Java_in_idea\\volunteerPlatform\\picData\\" + format;
 
         //再是保存文件的文件夹
         File folder = new File(realPath);

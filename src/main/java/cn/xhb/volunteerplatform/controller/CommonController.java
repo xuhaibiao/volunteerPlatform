@@ -58,10 +58,61 @@ public class CommonController {
             return Result.error();
         }
     }
-
-    @PostMapping("/signUp")
+    @PostMapping("/signUpWithFile")
     public Result<String> signUp(SignUpRequest signUpRequest, MultipartFile file, HttpServletRequest req) {
+        try {
+            // 注册社区工作者（创建社区）
+            // 先创建工作者实体
+            Worker worker = new Worker();
+            worker.setIdCard(signUpRequest.getIdCard());
+            worker.setName(signUpRequest.getUsername());
+            worker.setPassword(signUpRequest.getPassword());
+            worker.setPhone(signUpRequest.getPhone());
+            worker.setAddress(signUpRequest.getProvince() + signUpRequest.getCity() + signUpRequest.getArea() + signUpRequest.getDetailAddress());
+            worker.setGender(signUpRequest.getGender());
+            worker.setCreateTime(new Date());
+            worker.setBanStatus(0);
+            // 需要等待超级管理员审核通过才能设置
+            worker.setCommunityId(-1);
+            int i = userService.addWorker(worker);
+            if (i > 0) {
+                Result<String> upload = this.uploadCommunityFile(file, req);
+                // 如果上传材料成功
+                if (upload.getCode() == 1) {
+                    //获取社区信息
+                    CommunityOrganization community = new CommunityOrganization();
+                    community.setProvince(signUpRequest.getCommunityProvince());
+                    community.setCity(signUpRequest.getCommunityCity());
+                    community.setArea(signUpRequest.getCommunityArea());
+                    community.setDetailAddress(signUpRequest.getCommunityDetailAddress());
+                    community.setName(signUpRequest.getCommunityName());
+                    community.setUndertaker(signUpRequest.getUsername());
+                    community.setCreateTime(new Date());
+                    community.setHasDeleted(0);
+                    community.setWorkerId(worker.getId());
+                    community.setFileinfo(upload.getData());
+                    // 需要等待管理员审核
+                    community.setHasApproved(0);
+                    int k = communityService.add(community);
+                    if (k > 0) {
+                        return Result.success(null);
+                    } else {
+                        return Result.error("注册失败！");
+                    }
+                } else {
+                    return upload;
+                }
 
+            } else {
+                return Result.error("注册失败！");
+            }
+        } catch (Exception e) {
+            return Result.error("注册失败！"+e.getMessage());
+        }
+    }
+
+    @PostMapping("/signUpWithoutFile")
+    public Result<String> signUp(@RequestBody SignUpRequest signUpRequest) {
         try {
             if (signUpRequest.getType() == 0) {
                 // 注册志愿者
@@ -84,7 +135,7 @@ public class CommonController {
                 } else {
                     return Result.error("注册失败！");
                 }
-            } else if (signUpRequest.getType() == 1) {
+            } else {
                 // 注册社区工作者（加入社区）
                 Worker worker = new Worker();
                 worker.setIdCard(signUpRequest.getIdCard());
@@ -115,57 +166,11 @@ public class CommonController {
                 } else {
                     return Result.error("注册失败！");
                 }
-
-            } else {
-                // 注册社区工作者（创建社区）
-                // 先创建工作者实体
-                Worker worker = new Worker();
-                worker.setIdCard(signUpRequest.getIdCard());
-                worker.setName(signUpRequest.getUsername());
-                worker.setPassword(signUpRequest.getPassword());
-                worker.setPhone(signUpRequest.getPhone());
-                worker.setAddress(signUpRequest.getProvince() + signUpRequest.getCity() + signUpRequest.getArea() + signUpRequest.getDetailAddress());
-                worker.setGender(signUpRequest.getGender());
-                worker.setCreateTime(new Date());
-                worker.setBanStatus(0);
-                // 需要等待超级管理员审核通过才能设置
-                worker.setCommunityId(-1);
-                int i = userService.addWorker(worker);
-                if (i > 0) {
-                    Result<String> upload = this.uploadCommunityFile(file, req);
-                    // 如果上传材料成功
-                    if (upload.getCode() == 1) {
-                        //获取社区信息
-                        CommunityOrganization community = new CommunityOrganization();
-                        community.setProvince(signUpRequest.getCommunityProvince());
-                        community.setCity(signUpRequest.getCommunityCity());
-                        community.setArea(signUpRequest.getCommunityArea());
-                        community.setDetailAddress(signUpRequest.getCommunityDetailAddress());
-                        community.setName(signUpRequest.getCommunityName());
-                        community.setUndertaker(signUpRequest.getUsername());
-                        community.setCreateTime(new Date());
-                        community.setHasDeleted(0);
-                        community.setWorkerId(worker.getId());
-                        community.setFileinfo(upload.getData());
-                        // 需要等待管理员审核
-                        community.setHasApproved(0);
-                        int k = communityService.add(community);
-                        if (k > 0) {
-                            return Result.success(null);
-                        } else {
-                            return Result.error("注册失败！");
-                        }
-                    } else {
-                        return upload;
-                    }
-
-                } else {
-                    return Result.error("注册失败！");
-                }
             }
         } catch (Exception e) {
             return Result.error("注册失败！"+e.getMessage());
         }
+
     }
 
     @GetMapping("/loadAllCommunity")
@@ -259,7 +264,8 @@ public class CommonController {
         }
 
         String format=sdf.format(new Date());
-        String realPath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\fileData\\" + format;
+//        String realPath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\fileData\\" + format;
+        String realPath = "E:\\Java_in_idea\\volunteerPlatform\\fileData\\" + format;
 
         //再是保存文件的文件夹
         File folder = new File(realPath);

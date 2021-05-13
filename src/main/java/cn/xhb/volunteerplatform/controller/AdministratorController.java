@@ -145,7 +145,8 @@ public class AdministratorController {
         BufferedOutputStream bos = null;
         OutputStream fos = null;
         try {
-            String filePath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\fileData";
+//            String filePath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\fileData";
+            String filePath = "E:\\Java_in_idea\\volunteerPlatform\\fileData";
             bis = new BufferedInputStream(new FileInputStream(filePath + "/" + fileDate + "/" + fileName));
             fos = resp.getOutputStream();
             bos = new BufferedOutputStream(fos);

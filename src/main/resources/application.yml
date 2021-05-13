@@ -36,5 +36,6 @@ server:
 
 path:
   show: /show/**
-  picPath: C:/Users/Lucas/IdeaProjects/volunteerPlatform/picData/
+#  picPath: C:/Users/Lucas/IdeaProjects/volunteerPlatform/picData/
+  picPath: E:/Java_in_idea/volunteerPlatform/picData/
 
