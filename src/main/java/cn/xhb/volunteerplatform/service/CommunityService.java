@@ -12,6 +12,7 @@ import cn.xhb.volunteerplatform.mapper.CommunityOrganizationMapper;
 import cn.xhb.volunteerplatform.mapper.MessageMapper;
 import cn.xhb.volunteerplatform.mapper.VolunteerMapper;
 import cn.xhb.volunteerplatform.mapper.WorkerMapper;
+import cn.xhb.volunteerplatform.util.DateUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -62,7 +63,9 @@ public class CommunityService {
             Volunteer volunteer = volunteerMapper.selectByPrimaryKey(volunteerId);
             tmp.setVolunteer(volunteer);
             tmp.setMessage(message);
+            tmp.setCreateTime(DateUtils.dateToStr(message.getCreateTime()));
             volunteerJoinListVo.add(tmp);
+
 
         }
         for (Message message : workerJoinMessages) {
@@ -72,6 +75,7 @@ public class CommunityService {
             Worker worker = workerMapper.selectByPrimaryKey(workerId);
             tmp.setWorker(worker);
             tmp.setMessage(message);
+            tmp.setCreateTime(DateUtils.dateToStr(message.getCreateTime()));
             workerJoinListVo.add(tmp);
         }
         rs.setVolunteerJoinList(volunteerJoinListVo);

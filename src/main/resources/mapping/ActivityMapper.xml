@@ -26,6 +26,13 @@
   <resultMap id="ResultMapWithBLOBs" type="cn.xhb.volunteerplatform.entity.Activity" extends="BaseResultMap" >
     <result column="content" property="content" jdbcType="LONGVARCHAR" />
   </resultMap>
+
+  <resultMap id="provinceActivityNum" type="cn.xhb.volunteerplatform.dto.vo.ChinaMapVo" >
+
+  </resultMap>
+
+
+
   <sql id="Base_Column_List" >
     id, province, city, area, name, recruit_begin_time, recruit_end_time, activity_begin_time, activity_end_time,
     recruit_number, working_hours, detail_address, recruit_range, worker_id, create_time, 
@@ -57,6 +64,7 @@
     <include refid="Blob_Column_List" />
     from activity
     where has_deleted = 0 and ban_status = 0
+    order by recruit_begin_time desc
   </select>
 
   <select id="selectNotDeletedByWorkerId" resultMap="BaseResultMap" parameterType="java.lang.Integer">
@@ -66,6 +74,7 @@
     <include refid="Blob_Column_List" />
     from activity
     where worker_id = #{workerId,jdbcType=INTEGER} and has_deleted = 0
+    order by create_time desc
   </select>
 
   <select id="selectNotDeletedBySearch" resultMap="BaseResultMap" parameterType="cn.xhb.volunteerplatform.dto.ActivitySearchQuery">
@@ -90,6 +99,7 @@
       name like "%"#{activitySearchQuery.activityName}"%" and
     </if>
     has_deleted = 0 and ban_status = 0
+    order by recruit_begin_time desc
   </select>
 
   <select id="countByYear" resultType="java.lang.Integer"  parameterType="java.lang.Integer" >
@@ -98,7 +108,12 @@
     where YEAR(create_time) &lt;= #{year,jdbcType=INTEGER} and has_deleted = 0
   </select>
 
-
+  <select id="countGroupByProvince" resultMap="provinceActivityNum" >
+    select province as `name`, count(*) as `value`
+    from activity
+    where has_deleted = 0 and ban_status = 0
+    group by province;
+  </select>
 
 
 

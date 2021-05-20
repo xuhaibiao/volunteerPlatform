@@ -18,7 +18,7 @@
     select
     <include refid="Base_Column_List" />
     from worker
-    where id_card = #{idCard,jdbcType=VARCHAR}
+    where id_card = #{idCard,jdbcType=VARCHAR} and ban_status = 0
   </select>
   <select id="selectByCommunityId" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select

@@ -9,4 +9,9 @@ public class WorkerListVo {
     public Worker worker;
 
     public Message message;
+
+    /**
+     * 申请时间
+     */
+    public String createTime;
 }

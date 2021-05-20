@@ -24,6 +24,12 @@ spring:
     multipart:
       max-file-size: 100MB
       max-request-size: 500MB
+  redis:
+    database: 0
+    host: 47.100.23.55
+    port: 6379
+    timeout: 60s
+
 
 mybatis:
   mapper-locations: classpath:mapping/*.xml
@@ -36,6 +42,6 @@ server:
 
 path:
   show: /show/**
-#  picPath: C:/Users/Lucas/IdeaProjects/volunteerPlatform/picData/
-  picPath: E:/Java_in_idea/volunteerPlatform/picData/
+  picPath: C:/WHUTData/picData/
+#  picPath: E:/Java_in_idea/volunteerPlatform/picData/    C:\Users\Lucas\Desktop
 

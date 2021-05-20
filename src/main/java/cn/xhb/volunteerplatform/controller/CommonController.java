@@ -2,24 +2,21 @@ package cn.xhb.volunteerplatform.controller;
 
 
 import cn.xhb.volunteerplatform.dto.*;
+import cn.xhb.volunteerplatform.dto.vo.ChinaMapVo;
 import cn.xhb.volunteerplatform.dto.vo.FiveYearNumberVo;
 import cn.xhb.volunteerplatform.entity.*;
 import cn.xhb.volunteerplatform.service.CommunityService;
 import cn.xhb.volunteerplatform.service.MessageService;
 import cn.xhb.volunteerplatform.service.StatisticsService;
 import cn.xhb.volunteerplatform.service.UserService;
+import cn.xhb.volunteerplatform.util.FileUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import java.io.File;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author HaibiaoXu
@@ -37,13 +34,17 @@ public class CommonController {
     CommunityService communityService;
     @Resource
     MessageService messageService;
+//    @Resource
+//    private RedisTemplate<String,List<Activity>> redisTemplate;
+
+
 
     @PostMapping("/login")
     public Result<BaseUser> login(@RequestBody LoginRequest loginRequest) {
         BaseUser user = null;
         int type = loginRequest.getType();
         if (type == 0) {
-            user = userService.getVolunteerByIdCard(loginRequest.getIdCard());
+            user =  userService.getVolunteerByIdCard(loginRequest.getIdCard());
         } else if (type == 1) {
             user = userService.getWorkerByIdCard(loginRequest.getIdCard());
         } else if (type == 2) {
@@ -53,13 +54,14 @@ public class CommonController {
         if (user != null && user.getPassword().equals(loginRequest.getPassword()) ) {
             // 密码不返前端
 //            user.setPassword(null);
+
             return Result.success(user, String.valueOf(type));
         } else{
-            return Result.error();
+            return Result.error("用户不存在或密码错误或已被封禁！");
         }
     }
     @PostMapping("/signUpWithFile")
-    public Result<String> signUp(SignUpRequest signUpRequest, MultipartFile file, HttpServletRequest req) {
+    public Result<String> signUp(SignUpRequest signUpRequest, MultipartFile file) {
         try {
             // 注册社区工作者（创建社区）
             // 先创建工作者实体
@@ -76,7 +78,7 @@ public class CommonController {
             worker.setCommunityId(-1);
             int i = userService.addWorker(worker);
             if (i > 0) {
-                Result<String> upload = this.uploadCommunityFile(file, req);
+                Result<String> upload = FileUtils.uploadCommunityFile(file);
                 // 如果上传材料成功
                 if (upload.getCode() == 1) {
                     //获取社区信息
@@ -234,62 +236,25 @@ public class CommonController {
 
     }
 
+
+
     @GetMapping("/statistics")
     public Result<StatisticsDataResponse> getStatisticsData() {
         StatisticsDataResponse statisticsDataResponse = new StatisticsDataResponse();
         FiveYearNumberVo f = statisticsService.getNumInFiveYear();
         int[] sexRatio = statisticsService.getSexRatio();
+        List<ChinaMapVo> provinceActivityNum = statisticsService.getProvinceActivityNum();
 
         statisticsDataResponse.setFiveYearNumberVo(f);
         statisticsDataResponse.setSexRatio(sexRatio);
-
+        statisticsDataResponse.setProvinceActivityNum(provinceActivityNum);
 
         return Result.success(statisticsDataResponse);
     }
 
 
-    public Result<String> uploadCommunityFile(MultipartFile file, HttpServletRequest req) {
-        if (file == null) {
-            return Result.error("上传文件为空");
-        }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        //再用pdf格式开始书写,先找原始的名字
-        String originName = file.getOriginalFilename();
-//        判断文件类型是不是pdf
-        if(!(originName.endsWith(".pdf")||originName.endsWith(".PDF"))){
-            //如果不是的话，就返回类型
-            return Result.error("文件类型不对");
 
-        }
 
-        String format=sdf.format(new Date());
-//        String realPath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\fileData\\" + format;
-        String realPath = "E:\\Java_in_idea\\volunteerPlatform\\fileData\\" + format;
-
-        //再是保存文件的文件夹
-        File folder = new File(realPath);
-        //如果不存在，就自己创建
-        if(!folder.exists()){
-            folder.mkdirs();
-        }
-        String newName = UUID.randomUUID().toString() + ".pdf";
-        Result<String> rs;
-        //然后就可以保存了
-        try {
-            file.transferTo(new File(folder,newName));
-            //这个还有一个url
-//            String url = req.getScheme() + "://" + req.getServerName() + ":" + req.getServerPort() + "/" + realPath + newName;
-            //如果指向成功了
-//            rs = Result.success(url);
-            rs = Result.success(newName + ";" + format);
-        } catch (IOException e) {
-            //返回异常
-            rs = Result.error(e.getMessage());
-
-        }
-        return  rs;
-
-    }
 
 }

@@ -30,6 +30,8 @@ public class WorkerController {
     CommunityService communityService;
     @Resource
     MessageService messageService;
+//    @Resource
+//    private RedisTemplate<String,List<Activity>> redisTemplate;
 
 
     @GetMapping("/activity")
@@ -76,6 +78,7 @@ public class WorkerController {
     public Result<Object> deleteActivity(@RequestParam("activityId") Integer activityId){
         int i = activityService.workerDeleteActivityByActivityId(activityId);
         if (i > 0) {
+//            redisTemplate.delete("notDeletedActivities");
             return Result.success(null);
         } else {
             return Result.error();
@@ -89,6 +92,7 @@ public class WorkerController {
         if (upload.getCode() == 1) {
             int i = activityService.addActivity(addActivityRquest, upload.getData());
             if (i > 0) {
+//                redisTemplate.delete("notDeletedActivities");
                 return Result.success(null);
             } else {
                 return Result.error("发布失败");
@@ -107,6 +111,7 @@ public class WorkerController {
         if (editUpload.getCode() == 1) {
             int i = activityService.editActivity(editActivityRquest, editUpload.getData());
             if (i > 0) {
+//                redisTemplate.delete("notDeletedActivities");
                 return Result.success(null);
             } else {
                 return Result.error("修改失败！");
@@ -121,6 +126,7 @@ public class WorkerController {
         public Result<String> editActivity(@RequestBody EditActivityRquest editActivityRquest){
             int i = activityService.editActivity(editActivityRquest, null);
             if (i > 0) {
+//                redisTemplate.delete("notDeletedActivities");
                 return Result.success(null);
             } else {
                 return Result.error("修改失败！");

@@ -34,6 +34,8 @@ public class ActivityService {
     VolunteerRecordMapper volunteerRecordMapper;
     @Resource
     CommunityOrganizationMapper communityOrganizationMapper;
+//    @Resource
+//    RedisTemplate<String,List<Activity>> redisTemplate;
 
     public List<ActivityResponse> activityToActivityResponse(List<Activity> activities) {
         if (activities == null || activities.size() == 0) {
@@ -97,9 +99,22 @@ public class ActivityService {
 //    }
 
     public List<ActivityResponse> getNotDeletedActivities() {
-        List<Activity> activities = activityMapper.selectNotDeleted();
-        return activityToActivityResponse(activities);
+            List<Activity> activities = activityMapper.selectNotDeleted();
+            return activityToActivityResponse(activities);
+
     }
+//    public List<ActivityResponse> getNotDeletedActivities() {
+//        ValueOperations<String,List<Activity>> ops = redisTemplate.opsForValue();
+//        List<Activity> notDeletedActivities = ops.get("notDeletedActivities");
+//        if (notDeletedActivities != null) {
+//            return activityToActivityResponse(notDeletedActivities);
+//        } else {
+//            List<Activity> activities = activityMapper.selectNotDeleted();
+//            ops.set("notDeletedActivities", activities);
+//            return activityToActivityResponse(activities);
+//        }
+//
+//    }
     public List<ActivityResponse> getNotDeletedActivitiesByWorkerId(Integer workerId) {
         List<Activity> activities = activityMapper.selectNotDeletedByWorkerId(workerId);
         return activityToActivityResponse(activities);
@@ -186,11 +201,14 @@ public class ActivityService {
             String[] recruitDateRange = editActivityRquest.getRecruitDateRange();
 //            System.out.println(activityDateRange[1]);
             // 前后端同步时间，后端需要增加8小时
+
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-            Date ab = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[0]));
-            Date ae = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[1]));
-            Date rb = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[0]));
-            Date re = DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[1]));
+
+            Date ab = activityDateRange[0].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[0])) : DateUtils.dayAddAndSub(Calendar.HOUR, 8, DateUtils.str2Date(activityDateRange[0]));
+            Date ae = activityDateRange[1].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[1])) : DateUtils.dayAddAndSub(Calendar.HOUR, 8, DateUtils.str2Date(activityDateRange[1]));
+            Date rb = recruitDateRange[0].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[0])) : DateUtils.dayAddAndSub(Calendar.HOUR, 8, DateUtils.str2Date(recruitDateRange[0]));
+            Date re = recruitDateRange[1].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[1])) : DateUtils.dayAddAndSub(Calendar.HOUR, 8, DateUtils.str2Date(recruitDateRange[1]));
+
             activity.setActivityBeginTime(ab);
             activity.setActivityEndTime(ae);
             activity.setRecruitBeginTime(rb);
@@ -206,7 +224,7 @@ public class ActivityService {
             }
             activity.setUpdateTime(new Date());
             return activityMapper.updateByPrimaryKeySelective(activity);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             return 0;
         }
     }

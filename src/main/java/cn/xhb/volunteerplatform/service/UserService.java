@@ -6,6 +6,7 @@ import cn.xhb.volunteerplatform.dto.*;
 import cn.xhb.volunteerplatform.entity.*;
 import cn.xhb.volunteerplatform.mapper.*;
 import cn.xhb.volunteerplatform.util.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -92,9 +93,8 @@ public class UserService {
                 volunteerRecord.setStatus(RecordConstant.ACTIVITY_HAS_DELETED);
             }else if (activity.getActivityBeginTime().before(now) && activity.getActivityEndTime().after(now) && volunteerRecord.getStatus() == ActivityConstant.SIGNED_UP_SUCCESS) {
                 volunteerRecord.setStatus(RecordConstant.ACTIVITY_IN_PROGRESS);
-            } else if (activity.getActivityEndTime().before(now) && volunteerRecord.getStatus() == ActivityConstant.SIGNED_UP_SUCCESS) {
+            } else if (activity.getActivityEndTime().before(now) && volunteerRecord.getStatus() == RecordConstant.ACTIVITY_IN_PROGRESS) {
                 volunteerRecord.setStatus(RecordConstant.ACTIVITY_IS_OVER);
-
             }
             volunteerRecordMapper.updateByPrimaryKeySelective(volunteerRecord);
             ActivityResponse activityResponse = new ActivityResponse();
@@ -126,8 +126,14 @@ public class UserService {
             }
             int signedUp = volunteerRecordMapper.countByActivity(activity.getId());
             activityResponse.setHasRecruitedNumber(signedUp);
+            String picInfo = volunteerRecord.getPicInfo();
+            if (StringUtils.isNotBlank(picInfo)) {
+                String[] picInfos = picInfo.split(";");
+                String picName = picInfos[0];
+                String picDate = picInfos[1];
+                activityResponse.setPicUrl("http://localhost:9000/show/" + picDate + "/" + picName);
+            }
             volunteerRecordResponse.setActivityResponse(activityResponse);
-
             rs.add(volunteerRecordResponse);
         }
         return rs;
@@ -151,10 +157,13 @@ public class UserService {
                 tmp.setActivityName(activity.getName());
                 tmp.setVolunteerEvaluatContent(volunteerRecord.getVolunteerEvaluateContent());
                 tmp.setVolunteerEvaluateScore(volunteerRecord.getVolunteerEvaluateScore());
-                String[] picInfos = volunteerRecord.getPicInfo().split(";");
-                String picName = picInfos[0];
-                String picDate = picInfos[1];
-                tmp.setPicUrl("http://localhost:9000/show/" + picDate + "/" + picName);
+                String picInfo = volunteerRecord.getPicInfo();
+                if (StringUtils.isNotBlank(picInfo)) {
+                    String[] picInfos = picInfo.split(";");
+                    String picName = picInfos[0];
+                    String picDate = picInfos[1];
+                    tmp.setPicUrl("http://localhost:9000/show/" + picDate + "/" + picName);
+                }
                 Integer volunteerId = volunteerRecord.getVolunteerId();
                 Volunteer volunteer = volunteerMapper.selectByPrimaryKey(volunteerId);
                 tmp.setVolunteerName(volunteer.getName());
@@ -245,6 +254,15 @@ public class UserService {
             String picName = picInfos[0];
             String picDate = picInfos[1];
             info.setPicUrl("http://localhost:9000/show/" + picDate + "/" + picName);
+            if (info.getStatus() == RecordConstant.VOLUNTEER_HAS_EVALUATE_WORKER_NOT) {
+                info.setApprovedResult("待审核");
+            } else if (info.getStatus() == RecordConstant.ALL_HAS_EVALUATE) {
+                info.setApprovedResult("审核通过");
+            } else if (info.getStatus() == RecordConstant.ACTIVITY_HAS_DELETED) {
+                info.setApprovedResult("活动已删除");
+            } else if (info.getStatus() == RecordConstant.VOLUNTEER_APPROVE_FAILED) {
+                info.setApprovedResult("审核未通过");
+            }
         }
         return infos;
     }

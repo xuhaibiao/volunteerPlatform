@@ -44,7 +44,6 @@ public class VolunteerController {
     }
 
 
-
     @GetMapping("/activity/search")
     public Result<List<ActivityResponse>> getActivitiesBySearch(@RequestParam("province") String province,@RequestParam("city") String city,@RequestParam("area") String area,@RequestParam("activityName") String activityName){
         ActivitySearchQuery activitySearchQuery = new ActivitySearchQuery();
@@ -84,7 +83,6 @@ public class VolunteerController {
             return Result.error("报名失败！","error");
         } else if (type == ActivityConstant.HAS_DELETE) {
             return Result.error("活动已删除！", "error");
-            
         } else {
             return Result.success(null);
         }

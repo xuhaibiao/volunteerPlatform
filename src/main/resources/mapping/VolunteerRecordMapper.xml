@@ -78,9 +78,9 @@
   </select>
 
   <select id="selectVolunteerEvaluateInfoByActivityId" resultMap="volunteerEvaluateInfo">
-    select b.id,b.name,b.gender,a.volunteer_evaluate_score,a.volunteer_evaluate_content,a.picInfo
+    select b.id,b.name,b.gender,a.volunteer_evaluate_score,a.worker_evaluate,a.volunteer_evaluate_content,a.picInfo,a.status
     from volunteer_record as a, volunteer as b
-    where a.volunteer_id = b.id and a.activity_id = #{activityId,jdbcType=INTEGER} and status > 3;
+    where a.volunteer_id = b.id and a.activity_id = #{activityId,jdbcType=INTEGER} and status > 4;
 
   </select>
 

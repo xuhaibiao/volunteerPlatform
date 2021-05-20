@@ -1,6 +1,7 @@
 package cn.xhb.volunteerplatform.mapper;
 
 import cn.xhb.volunteerplatform.dto.ActivitySearchQuery;
+import cn.xhb.volunteerplatform.dto.vo.ChinaMapVo;
 import cn.xhb.volunteerplatform.entity.Activity;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,6 @@ public interface ActivityMapper {
     int updateByPrimaryKey(Activity record);
 
     int countByYear(int year);
+
+    List<ChinaMapVo> countGroupByProvince();
 }

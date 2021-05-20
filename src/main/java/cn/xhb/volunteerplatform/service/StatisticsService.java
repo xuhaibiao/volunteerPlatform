@@ -1,5 +1,6 @@
 package cn.xhb.volunteerplatform.service;
 
+import cn.xhb.volunteerplatform.dto.vo.ChinaMapVo;
 import cn.xhb.volunteerplatform.dto.vo.FiveYearNumberVo;
 import cn.xhb.volunteerplatform.mapper.ActivityMapper;
 import cn.xhb.volunteerplatform.mapper.VolunteerMapper;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Calendar;
+import java.util.List;
 
 @Service
 public class StatisticsService {
@@ -43,5 +45,14 @@ public class StatisticsService {
         rs[0] = female;
         rs[1] = male;
         return rs;
+    }
+
+    public List<ChinaMapVo> getProvinceActivityNum(){
+        List<ChinaMapVo> chinaMapVos = activityMapper.countGroupByProvince();
+        for (ChinaMapVo chinaMapVo : chinaMapVos) {
+            String name = chinaMapVo.getName();
+            chinaMapVo.setName(name.substring(0, name.length() - 1));
+        }
+        return chinaMapVos;
     }
 }

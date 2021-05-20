@@ -7,18 +7,13 @@ import cn.xhb.volunteerplatform.service.ActivityService;
 import cn.xhb.volunteerplatform.service.CommunityService;
 import cn.xhb.volunteerplatform.service.MessageService;
 import cn.xhb.volunteerplatform.service.UserService;
+import cn.xhb.volunteerplatform.util.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileInputStream;
-import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -33,6 +28,8 @@ public class AdministratorController {
     MessageService messageService;
     @Resource
     CommunityService communityService;
+//    @Resource
+//    RedisTemplate<String,List<Activity>> redisTemplate;
 
     @GetMapping("/volunteerAuthority")
     public Result<List<VolunteerAuthorityResponse>> getAllVolunteer() {
@@ -118,6 +115,7 @@ public class AdministratorController {
             if (StringUtils.isNotBlank(changeActivityBanStatusRequest.getReason())) {
                 int k = messageService.addChangeActivityBanStatusSystemMsg(communityId, activity, changeActivityBanStatusRequest.getReason());
                 if (k > 0) {
+//                    redisTemplate.delete("notDeletedActivities");
                     return Result.success(null);
                 }
             } else {
@@ -140,62 +138,7 @@ public class AdministratorController {
 
     @GetMapping("/download")
     public void download(@RequestParam("fileName") String fileName, @RequestParam("fileDate") String fileDate, HttpServletRequest req, HttpServletResponse resp) {
-
-        BufferedInputStream bis = null;
-        BufferedOutputStream bos = null;
-        OutputStream fos = null;
-        try {
-//            String filePath = "C:\\Users\\Lucas\\IdeaProjects\\volunteerPlatform\\fileData";
-            String filePath = "E:\\Java_in_idea\\volunteerPlatform\\fileData";
-            bis = new BufferedInputStream(new FileInputStream(filePath + "/" + fileDate + "/" + fileName));
-            fos = resp.getOutputStream();
-            bos = new BufferedOutputStream(fos);
-            setFileDownloadHeader(req, resp, fileName);
-            resp.setContentType("application/octet-stream");
-            resp.setHeader("Content-Disposition", "attachment;filename=" + new String(fileName.getBytes(StandardCharsets.UTF_8), "iso-8859-1"));
-            int byteRead = 0;
-            byte[] buffer = new byte[2048];
-            while ((byteRead = bis.read(buffer)) != -1) {
-                bos.write(buffer, 0, byteRead);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                assert bos != null;
-                bos.flush();
-                bis.close();
-                fos.close();
-                bos.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
+        FileUtils.download(fileName, fileDate, req, resp);
     }
-
-    public static void setFileDownloadHeader(HttpServletRequest request,
-                                             HttpServletResponse response, String fileName) {
-        try {
-            String encodedFileName = null;
-            String agent = request.getHeader("USER-AGENT");
-            if (null != agent && agent.contains("MSIE")) {
-                encodedFileName = URLEncoder.encode(fileName, "UTF-8");
-            } else if (null != agent && agent.contains("Mozilla")) {
-                encodedFileName = new String(fileName.getBytes(StandardCharsets.UTF_8),
-                        StandardCharsets.ISO_8859_1);
-            } else {
-                encodedFileName = URLEncoder.encode(fileName, "UTF-8");
-            }
-
-            response.setContentType("application/x-download;charset=UTF-8");
-            response.setHeader("Content-Disposition", "attachment;filename=\""
-                    + encodedFileName + "\"");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
 
 }
