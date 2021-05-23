@@ -204,10 +204,10 @@ public class ActivityService {
 
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
-            Date ab = activityDateRange[0].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[0])) : DateUtils.dayAddAndSub(Calendar.HOUR, 8, DateUtils.str2Date(activityDateRange[0]));
-            Date ae = activityDateRange[1].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[1])) : DateUtils.dayAddAndSub(Calendar.HOUR, 8, DateUtils.str2Date(activityDateRange[1]));
-            Date rb = recruitDateRange[0].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[0])) : DateUtils.dayAddAndSub(Calendar.HOUR, 8, DateUtils.str2Date(recruitDateRange[0]));
-            Date re = recruitDateRange[1].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[1])) : DateUtils.dayAddAndSub(Calendar.HOUR, 8, DateUtils.str2Date(recruitDateRange[1]));
+            Date ab = activityDateRange[0].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[0])) : DateUtils.str2Date(activityDateRange[0]);
+            Date ae = activityDateRange[1].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[1])) : DateUtils.str2Date(activityDateRange[1]);
+            Date rb = recruitDateRange[0].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[0])) : DateUtils.str2Date(recruitDateRange[0]);
+            Date re = recruitDateRange[1].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[1])) : DateUtils.str2Date(recruitDateRange[1]);
 
             activity.setActivityBeginTime(ab);
             activity.setActivityEndTime(ae);
