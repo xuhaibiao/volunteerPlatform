@@ -34,9 +34,6 @@ public class CommonController {
     CommunityService communityService;
     @Resource
     MessageService messageService;
-//    @Resource
-//    private RedisTemplate<String,List<Activity>> redisTemplate;
-
 
 
     @PostMapping("/login")

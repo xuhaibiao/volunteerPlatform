@@ -29,6 +29,12 @@ spring:
     host: 47.100.23.55
     port: 6379
     timeout: 60s
+    jedis:
+      pool:
+        max-active: 20
+        max-wait: -1
+        max-idle: 5
+        min-idle: 0
 
 
 mybatis:

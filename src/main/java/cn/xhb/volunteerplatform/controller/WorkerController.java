@@ -2,13 +2,11 @@ package cn.xhb.volunteerplatform.controller;
 
 
 import cn.xhb.volunteerplatform.dto.*;
-import cn.xhb.volunteerplatform.entity.CommunityOrganization;
-import cn.xhb.volunteerplatform.entity.Message;
-import cn.xhb.volunteerplatform.entity.Volunteer;
-import cn.xhb.volunteerplatform.entity.Worker;
+import cn.xhb.volunteerplatform.entity.*;
 import cn.xhb.volunteerplatform.service.*;
 import cn.xhb.volunteerplatform.util.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,8 +28,8 @@ public class WorkerController {
     CommunityService communityService;
     @Resource
     MessageService messageService;
-//    @Resource
-//    private RedisTemplate<String,List<Activity>> redisTemplate;
+    @Resource
+    private RedisTemplate<String,List<Activity>> redisTemplate;
 
 
     @GetMapping("/activity")
@@ -78,7 +76,7 @@ public class WorkerController {
     public Result<Object> deleteActivity(@RequestParam("activityId") Integer activityId){
         int i = activityService.workerDeleteActivityByActivityId(activityId);
         if (i > 0) {
-//            redisTemplate.delete("notDeletedActivities");
+            redisTemplate.delete("notDeletedActivities");
             return Result.success(null);
         } else {
             return Result.error();
@@ -92,7 +90,7 @@ public class WorkerController {
         if (upload.getCode() == 1) {
             int i = activityService.addActivity(addActivityRquest, upload.getData());
             if (i > 0) {
-//                redisTemplate.delete("notDeletedActivities");
+                redisTemplate.delete("notDeletedActivities");
                 return Result.success(null);
             } else {
                 return Result.error("发布失败");
@@ -111,7 +109,7 @@ public class WorkerController {
         if (editUpload.getCode() == 1) {
             int i = activityService.editActivity(editActivityRquest, editUpload.getData());
             if (i > 0) {
-//                redisTemplate.delete("notDeletedActivities");
+                redisTemplate.delete("notDeletedActivities");
                 return Result.success(null);
             } else {
                 return Result.error("修改失败！");
@@ -126,7 +124,7 @@ public class WorkerController {
         public Result<String> editActivity(@RequestBody EditActivityRquest editActivityRquest){
             int i = activityService.editActivity(editActivityRquest, null);
             if (i > 0) {
-//                redisTemplate.delete("notDeletedActivities");
+                redisTemplate.delete("notDeletedActivities");
                 return Result.success(null);
             } else {
                 return Result.error("修改失败！");

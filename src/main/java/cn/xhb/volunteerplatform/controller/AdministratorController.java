@@ -9,6 +9,7 @@ import cn.xhb.volunteerplatform.service.MessageService;
 import cn.xhb.volunteerplatform.service.UserService;
 import cn.xhb.volunteerplatform.util.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -28,8 +29,8 @@ public class AdministratorController {
     MessageService messageService;
     @Resource
     CommunityService communityService;
-//    @Resource
-//    RedisTemplate<String,List<Activity>> redisTemplate;
+    @Resource
+    RedisTemplate<String,List<Activity>> redisTemplate;
 
     @GetMapping("/volunteerAuthority")
     public Result<List<VolunteerAuthorityResponse>> getAllVolunteer() {
@@ -115,7 +116,7 @@ public class AdministratorController {
             if (StringUtils.isNotBlank(changeActivityBanStatusRequest.getReason())) {
                 int k = messageService.addChangeActivityBanStatusSystemMsg(communityId, activity, changeActivityBanStatusRequest.getReason());
                 if (k > 0) {
-//                    redisTemplate.delete("notDeletedActivities");
+                    redisTemplate.delete("notDeletedActivities");
                     return Result.success(null);
                 }
             } else {

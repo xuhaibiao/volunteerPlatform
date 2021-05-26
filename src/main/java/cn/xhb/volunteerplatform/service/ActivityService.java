@@ -13,6 +13,8 @@ import cn.xhb.volunteerplatform.mapper.VolunteerRecordMapper;
 import cn.xhb.volunteerplatform.mapper.WorkerMapper;
 import cn.xhb.volunteerplatform.util.DateUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -34,8 +36,8 @@ public class ActivityService {
     VolunteerRecordMapper volunteerRecordMapper;
     @Resource
     CommunityOrganizationMapper communityOrganizationMapper;
-//    @Resource
-//    RedisTemplate<String,List<Activity>> redisTemplate;
+    @Resource
+    RedisTemplate<String,List<Activity>> redisTemplate;
 
     public List<ActivityResponse> activityToActivityResponse(List<Activity> activities) {
         if (activities == null || activities.size() == 0) {
@@ -98,23 +100,23 @@ public class ActivityService {
 //        return activityToActivityResponse(activities);
 //    }
 
-    public List<ActivityResponse> getNotDeletedActivities() {
-            List<Activity> activities = activityMapper.selectNotDeleted();
-            return activityToActivityResponse(activities);
-
-    }
 //    public List<ActivityResponse> getNotDeletedActivities() {
-//        ValueOperations<String,List<Activity>> ops = redisTemplate.opsForValue();
-//        List<Activity> notDeletedActivities = ops.get("notDeletedActivities");
-//        if (notDeletedActivities != null) {
-//            return activityToActivityResponse(notDeletedActivities);
-//        } else {
 //            List<Activity> activities = activityMapper.selectNotDeleted();
-//            ops.set("notDeletedActivities", activities);
 //            return activityToActivityResponse(activities);
-//        }
 //
 //    }
+    public List<ActivityResponse> getNotDeletedActivities() {
+        ValueOperations<String,List<Activity>> ops = redisTemplate.opsForValue();
+        List<Activity> notDeletedActivities = ops.get("notDeletedActivities");
+        if (notDeletedActivities != null) {
+            return activityToActivityResponse(notDeletedActivities);
+        } else {
+            List<Activity> activities = activityMapper.selectNotDeleted();
+            ops.set("notDeletedActivities", activities);
+            return activityToActivityResponse(activities);
+        }
+
+    }
     public List<ActivityResponse> getNotDeletedActivitiesByWorkerId(Integer workerId) {
         List<Activity> activities = activityMapper.selectNotDeletedByWorkerId(workerId);
         return activityToActivityResponse(activities);
@@ -203,7 +205,6 @@ public class ActivityService {
             // 前后端同步时间，后端需要增加8小时
 
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-
             Date ab = activityDateRange[0].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[0])) : DateUtils.str2Date(activityDateRange[0]);
             Date ae = activityDateRange[1].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(activityDateRange[1])) : DateUtils.str2Date(activityDateRange[1]);
             Date rb = recruitDateRange[0].charAt(0) < '9' ? DateUtils.dayAddAndSub(Calendar.HOUR, 8, df.parse(recruitDateRange[0])) : DateUtils.str2Date(recruitDateRange[0]);
